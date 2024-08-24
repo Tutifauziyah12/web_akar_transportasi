@@ -18,6 +18,7 @@ class Sewa extends Model
         'nama',
         'mulai_tanggal',
         'akhir_tanggal',
+        'pengembalian_tanggal',
         'total',
         'pembayaran',
         'metode',

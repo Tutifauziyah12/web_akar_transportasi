@@ -19,10 +19,11 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
 
                     // Set data form menggunakan respons dari API
                     setData({
-                        kode: sewaData.kode,
+                        kode: sewaData.id_sewa,
                         nama: sewaData.nama,
                         mulai_tanggal: sewaData.mulai_tanggal,
                         akhir_tanggal: sewaData.akhir_tanggal,
+                        pengembalian_tanggal: sewaData.pengembalian_tanggal,
                         kendaraan_ids: sewaData.sewa_kendaraan.map(
                             (k) => k.kendaraan_id
                         ),
@@ -31,7 +32,7 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                         tipe_pembayaran: sewaData.tipe_pembayaran,
                         pembayaran: sewaData.pembayaran,
                         pendapatanLainnya: sewaData.pendapatan_lainnya,
-                        updated_at: sewaData.updated_at,
+                        created_at: sewaData.created_at,
                     });
                 })
                 .catch((error) => {
@@ -45,13 +46,14 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
         nama: "",
         mulai_tanggal: "",
         akhir_tanggal: "",
+        pengembalian_tanggal: "",
         kendaraan_ids: [],
         total: 0,
         metode: "",
         tipe_pembayaran: "",
         pembayaran: 0,
         pendapatanLainnya: [],
-        updated_at: "",
+        created_at: "",
     });
 
     const [pembayaranTotal, setPembayaranTotal] = useState(0);
@@ -137,8 +139,8 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                                 <td className="w-10"></td>
                                 <td>
                                     <FormatDateRange
-                                        startDateString={data.updated_at}
-                                        endDateString={data.updated_at}
+                                        startDateString={data.created_at}
+                                        endDateString={data.created_at}
                                     />
                                 </td>
                             </tr>
@@ -153,13 +155,26 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
 
                             <tr>
                                 <td className="font-semibold py-1">
-                                    Tanggal Sewa
+                                    Tanggal Ambil Kendaraan
                                 </td>
                                 <td className="w-10"></td>
                                 <td>
                                     <FormatDateRange
                                         startDateString={data.mulai_tanggal}
                                         endDateString={data.akhir_tanggal}
+                                    />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td className="font-semibold py-1">
+                                    Tanggal Pengembalian Kendaraan
+                                </td>
+                                <td className="w-10"></td>
+                                <td>
+                                    <FormatDateRange
+                                        startDateString={data.pengembalian_tanggal}
+                                        endDateString={data.pengembalian_tanggal}
                                     />
                                 </td>
                             </tr>

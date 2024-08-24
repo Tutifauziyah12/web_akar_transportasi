@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nama');
             $table->date('mulai_tanggal');
             $table->date('akhir_tanggal');
+            $table->date('pengembalian_tanggal')->nullable();
             $table->bigInteger('total');
             $table->bigInteger('pembayaran');
             $table->string('metode');

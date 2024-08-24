@@ -26,6 +26,7 @@ class UpdateSewaRequest extends FormRequest
             'nama' => 'required|string|max:100|not_regex:/^\s*$/',
             'mulai_tanggal' => 'required|date',
             'akhir_tanggal' => 'required|date|after_or_equal:mulai_tanggal',
+            'pengembalian_tanggal' => 'nullable|date',
             'total' => 'required|numeric|min:0',
             'pembayaran' => 'required|numeric|min:0',
             'metode' => 'required|string|in:Cash,Debit,Kredit',
@@ -56,6 +57,8 @@ class UpdateSewaRequest extends FormRequest
             'akhir_tanggal.date' => 'Format tanggal akhir tidak valid.',
             'akhir_tanggal.after_or_equal' => 'Tanggal akhir harus setelah atau sama dengan tanggal mulai.',
 
+            'pengembalian_tanggal.date' => 'Format tanggal pengembalian tidak valid.',
+
             'total.required' => 'Total harus diisi.',
             'total.numeric' => 'Total harus berupa angka.',
             'total.min' => 'Total tidak boleh kurang dari :min.',
@@ -66,7 +69,7 @@ class UpdateSewaRequest extends FormRequest
 
             'metode.required' => 'Metode pembayaran harus dipilih.',
             'metode.string' => 'Metode pembayaran harus berupa teks.',
-            'metode.in' => 'Metode pembayaran harus salah satu dari: cash, debit, kredit.',
+            'metode.in' => 'Metode pembayaran harus salah satu dari: Cash, Debit, Kredit.',
         ];
     }
 };

@@ -180,11 +180,11 @@ class SewaController extends Controller
 
     public function show(Sewa $sewa, $kode)
     {
-        // dd($kode);
         $lastSewa = Sewa::with('sewaKendaraan.kendaraan', 'pendapatanLainnya')
             ->where('id_sewa', 'like', $kode)
             ->orderBy('id_sewa', 'desc')
             ->first();
+        
         return response()->json($lastSewa);
     }
 
@@ -272,28 +272,28 @@ class SewaController extends Controller
         }
     }
 
-        public function destroy(Sewa $sewa, $kode)
-        {
-            try {
-                DB::beginTransaction();
+    public function destroy(Sewa $sewa, $kode)
+    {
+        try {
+            DB::beginTransaction();
 
-                SewaKendaraan::where('id_sewa_kendaraans', $kode)->delete();
+            SewaKendaraan::where('id_sewa_kendaraans', $kode)->delete();
 
-                SewaLainnya::where('id_sewa_lainnya', $kode)->delete();
+            SewaLainnya::where('id_sewa_lainnya', $kode)->delete();
 
-                Sewa::where('id_sewa', $kode)->delete();
+            Sewa::where('id_sewa', $kode)->delete();
 
-                Kas::where('id_kas', $kode)->delete();
+            Kas::where('id_kas', $kode)->delete();
 
-                DB::commit();
+            DB::commit();
 
-                return redirect()->route('sewa.index')->with('message', sprintf(
-                    "Sewa dengan code %s berhasil dihapus!",
-                    $kode
-                ));
-            } catch (\Exception $e) {
-                DB::rollback();
-                return back()->withErrors(['message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()]);
-            }
+            return redirect()->route('sewa.index')->with('message', sprintf(
+                "Sewa dengan code %s berhasil dihapus!",
+                $kode
+            ));
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors(['message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()]);
         }
+    }
 }

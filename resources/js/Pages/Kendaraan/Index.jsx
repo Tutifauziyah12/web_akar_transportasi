@@ -231,7 +231,7 @@ export default function Index({
                                                 >
                                                     <IoPencil />
                                                 </a>
-                                                <button
+                                                {/* <button
                                                     onClick={() =>
                                                         handleShowDelete(
                                                             kendaraan.id_kendaraans
@@ -240,7 +240,7 @@ export default function Index({
                                                     className="px-2 py-1 text-center hover:text-red-600"
                                                 >
                                                     <IoTrash />
-                                                </button>
+                                                </button> */}
                                             </td>
                                         </tr>
                                     ))

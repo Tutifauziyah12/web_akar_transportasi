@@ -112,7 +112,6 @@ export default function Create({ lastKode, handleClose }) {
                 },
             });
         } catch (err) {
-            console.log(err)
             if (err.inner) {
                 const newErrors = {};
                 err.inner.forEach((error) => {
@@ -124,7 +123,6 @@ export default function Create({ lastKode, handleClose }) {
             }
         }
     };
-    console.log("errors", errors)
 
     const today = new Date();
 

@@ -35,7 +35,6 @@ export default function Index({
     kendaraans,
     lastKode,
 }) {
-    console.log("sewa", sewa.data);
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm || "");
     const [state, setState] = useState([
         {
@@ -155,8 +154,8 @@ export default function Index({
 
     const handleDelete = (kode) => {
         Inertia.delete(route("sewa.destroy", kode));
-        handleCloseDelete()
-        toast.success("Pendapatan Sewa berhasil dihapus!")
+        handleCloseDelete();
+        toast.success("Pendapatan Sewa berhasil dihapus!");
     };
 
     const handleCetak = (kode) => {
@@ -216,7 +215,7 @@ export default function Index({
                                             endDate={state[0].endDate}
                                             selectsRange
                                             customInput={<ExampleCustomInput />}
-                                            dateFormat="dd MMMM yyyy"
+                                            dateFormat="d MMMM yyyy"
                                             locale="id"
                                         />
                                     </div>
@@ -269,6 +268,12 @@ export default function Index({
                                         Tanggal
                                     </th>
                                     <th scope="col" className="px-3 py-2">
+                                        Tanggal Ambil Kendaraan
+                                    </th>
+                                    <th scope="col" className="px-3 py-2">
+                                        Tanggal Pengembalian Kendaraan
+                                    </th>
+                                    <th scope="col" className="px-3 py-2">
                                         Nama Penyewa
                                     </th>
                                     <th scope="col" className="px-3 py-2">
@@ -292,7 +297,7 @@ export default function Index({
                                 {sewa.data.length === 0 ? (
                                     <tr>
                                         <td
-                                            colSpan="8"
+                                            colSpan="10"
                                             className="px-6 py-4 text-center bg-white border-b hover:bg-gray-50"
                                         >
                                             Sewa Kendaraan tidak ditemukan
@@ -319,6 +324,30 @@ export default function Index({
                                                         swa.created_at
                                                     }
                                                 />
+                                            </td>
+                                            <td className="px-3 py-2">
+                                                <FormatDateRange
+                                                    startDateString={
+                                                        swa.mulai_tanggal
+                                                    }
+                                                    endDateString={
+                                                        swa.akhir_tanggal
+                                                    }
+                                                />
+                                            </td>
+                                            <td className="px-3 py-2">
+                                                {swa.pengembalian_tanggal ? (
+                                                    <FormatDateRange
+                                                        startDateString={
+                                                            swa.pengembalian_tanggal
+                                                        }
+                                                        endDateString={
+                                                            swa.pengembalian_tanggal
+                                                        }
+                                                    />
+                                                ) : (
+                                                    "-"
+                                                )}
                                             </td>
                                             <td className="px-3 py-2">
                                                 {swa.nama}
@@ -401,7 +430,9 @@ export default function Index({
                                             <td className="px-1 pr-5 py-2 flex justify-center space-x-2">
                                                 <a
                                                     onClick={() =>
-                                                        handleShowEdit(swa.id_sewa)
+                                                        handleShowEdit(
+                                                            swa.id_sewa
+                                                        )
                                                     }
                                                     className="px-2 text-center hover:text-yellow-600"
                                                 >

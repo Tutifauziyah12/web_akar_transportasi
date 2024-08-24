@@ -4,7 +4,6 @@ import FormatDateRange from "@/Utils/FormatDateRange";
 
 const PrintBukuBesarTable = React.forwardRef(
     ({ kasList, formattedDateRange, date }, ref) => {
-        console.log(kasList)
         let number = 1;
 
         let totalPendapatan = 0;

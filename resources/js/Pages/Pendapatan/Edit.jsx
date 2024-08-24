@@ -33,10 +33,12 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
                     // Set data form menggunakan respons dari API
                     setData({
+                        created_at: sewaData.created_at,
                         kode: sewaData.id_sewa,
                         nama: sewaData.nama,
                         mulai_tanggal: sewaData.mulai_tanggal,
                         akhir_tanggal: sewaData.akhir_tanggal,
+                        pengembalian_tanggal: sewaData.pengembalian_tanggal,
                         kendaraan_ids: sewaData.sewa_kendaraan.map(
                             (k) => k.kendaraan_id
                         ),
@@ -54,10 +56,12 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
     }, [kode]);
 
     const { data, setData, put, errors, processing, reset } = useForm({
+        created_at: "",
         kode: "",
         nama: "",
         mulai_tanggal: "",
         akhir_tanggal: "",
+        pengembalian_tanggal: "",
         kendaraan_ids: [],
         total: 0,
         metode: "",
@@ -191,28 +195,23 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
         kendaraan.nama.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const formatDateToYYYYMMDD = (date) => {
-        if (!date) return "";
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
-
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [startDatePengembalian, setStartDatePengembalian] = useState(null);
+    const [date, setDate] = useState(null);
+
 
     useEffect(() => {
-        if (sewa && sewa.mulai_tanggal) {
-            setStartDate(new Date(sewa.mulai_tanggal));
-        } else {
-            setStartDate(null);
-        }
+        if (sewa) {
+            const parseDate = (dateString) => {
+                const date = new Date(dateString);
+                return isNaN(date.getTime()) ? null : date;
+            };
 
-        if (sewa && sewa.akhir_tanggal) {
-            setEndDate(new Date(sewa.akhir_tanggal));
-        } else {
-            setEndDate(null);
+            setStartDate(parseDate(sewa.mulai_tanggal));
+            setEndDate(parseDate(sewa.akhir_tanggal));
+            setStartDatePengembalian(parseDate(sewa.pengembalian_tanggal));
+            setDate(parseDate(sewa.created_at));
         }
     }, [sewa]);
 
@@ -220,19 +219,33 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
         const [start, end] = dates;
         if (start && end && start.getTime() === end.getTime()) {
             setStartDate(start);
-            setEndDate("");
+            setEndDate(null);
         } else {
             setStartDate(start);
             setEndDate(end);
         }
     };
 
+    const onChangePengembalian = (date) => {
+        if (date instanceof Date && !isNaN(date.getTime())) {
+            setStartDatePengembalian(date);
+            const formattedDate = date.toISOString().split("T")[0];
+            setData("pengembalian_tanggal", formattedDate);
+        } else {
+            console.error("Invalid date value:", date);
+        }
+    };
+
+    const formatDateToYYYYMMDD = (date) => {
+        if (!date || isNaN(date.getTime())) return "";
+        return date.toISOString().split("T")[0];
+    };
+
     data.mulai_tanggal = formatDateToYYYYMMDD(startDate);
-    if (endDate === null || endDate === "") {
-        data.akhir_tanggal = formatDateToYYYYMMDD(startDate);
-    } else {
-        data.akhir_tanggal = formatDateToYYYYMMDD(endDate);
-    }
+    data.akhir_tanggal = endDate
+        ? formatDateToYYYYMMDD(endDate)
+        : formatDateToYYYYMMDD(startDate);
+    data.pengembalian_tanggal = formatDateToYYYYMMDD(startDatePengembalian);
 
     const [pembayaranTotal, setPembayaranTotal] = useState(0);
 
@@ -300,12 +313,25 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
     };
 
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => {
+        const formattedValue = (dateStr) => {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return "";
+            return date.toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+            });
+        };
+
         const renderedValues = () => {
+            if (!value) return "";
             const [start, end] = value.split(" - ");
+            const formattedStart = formattedValue(start);
+            const formattedEnd = formattedValue(end);
             if (!end || start === end) {
-                return start;
+                return formattedStart;
             }
-            return `${start} - ${end}`;
+            return `${formattedStart} - ${formattedEnd}`;
         };
         return (
             <input
@@ -315,6 +341,23 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                 ref={ref}
                 placeholder="Pilih tanggal..."
                 value={renderedValues()}
+                readOnly
+            />
+        );
+    });
+
+    const ExampleCustomInput1 = forwardRef(({ value, onClick }, ref) => {
+        // const formattedValue = value
+        //     ? new Date(value).toLocaleDateString("id-ID")
+        //     : "";
+        return (
+            <input
+                type="text"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-xs 2xl:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-64 2xl:w-72 p-2 2xl:p-2.5"
+                onClick={onClick}
+                ref={ref}
+                placeholder="Pilih tanggal..."
+                value={value}
                 readOnly
             />
         );
@@ -340,7 +383,6 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                 },
             });
         } catch (err) {
-            console.log("err", err)
             if (err.inner) {
                 const newErrors = {};
                 err.inner.forEach((error) => {
@@ -352,8 +394,6 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
             }
         }
     };
-
-    console.log("errors", errors)
 
     return (
         <>
@@ -388,6 +428,23 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
                         <div>
                             <label
+                                htmlFor="tanggal"
+                                className="block mb-2 font-semibold text-gray-700"
+                            >
+                                Tanggal
+                            </label>
+
+                            <DatePicker
+                                selected={date}
+                                customInput={<ExampleCustomInput1 />}
+                                dateFormat="d MMMM yyyy"
+                                locale="id"
+                                readOnly
+                            />
+                        </div>
+
+                        <div>
+                            <label
                                 htmlFor="nama"
                                 className="block mb-2 font-semibold text-gray-700"
                             >
@@ -416,7 +473,7 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                                 htmlFor="tanggal"
                                 className="block mb-2 font-semibold text-gray-700"
                             >
-                                Tanggal
+                                Tanggal Ambil
                             </label>
 
                             <DatePicker
@@ -428,6 +485,7 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                                 customInput={<ExampleCustomInput />}
                                 dateFormat="dd MMMM yyyy"
                                 locale="id"
+                                minDate={new Date()}
                             />
 
                             {(validationErrors.mulai_tanggal ||
@@ -439,9 +497,27 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                             )}
                         </div>
 
-                        <div className="relative">
+                        <div>
                             <label
                                 htmlFor="tanggal"
+                                className="block mb-2 font-semibold text-gray-700"
+                            >
+                                Tanggal Pengembalian
+                            </label>
+
+                            <DatePicker
+                                selected={startDatePengembalian}
+                                onChange={onChangePengembalian}
+                                customInput={<ExampleCustomInput1 />}
+                                dateFormat="d MMMM yyyy"
+                                locale="id"
+                                minDate={new Date()}
+                            />
+                        </div>
+
+                        <div className="relative">
+                            <label
+                                htmlFor="pilih kendaraan"
                                 className="block mb-2 font-semibold text-gray-700"
                             >
                                 Pilih Kendaran
@@ -486,7 +562,9 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                                             filteredKendaraans.map(
                                                 (kendaraan) => (
                                                     <li
-                                                        key={kendaraan.id_kendaraans}
+                                                        key={
+                                                            kendaraan.id_kendaraans
+                                                        }
                                                         className="px-4 py-2"
                                                     >
                                                         <div className="flex items-center">
@@ -534,17 +612,24 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                                         Kendaraan Dipilih
                                     </label>
                                     <ul className="list-disc list-inside">
-                                        {data.kendaraan_ids.map((id_kendaraans) => {
-                                            const kendaraan = kendaraans.find(
-                                                (k) => k.id_kendaraans === parseInt(id_kendaraans)
-                                            );
-                                            return (
-                                                <li key={id_kendaraans}>
-                                                    {kendaraan &&
-                                                        `${kendaraan.nama} (${kendaraan.no_registrasi})`}
-                                                </li>
-                                            );
-                                        })}
+                                        {data.kendaraan_ids.map(
+                                            (id_kendaraans) => {
+                                                const kendaraan =
+                                                    kendaraans.find(
+                                                        (k) =>
+                                                            k.id_kendaraans ===
+                                                            parseInt(
+                                                                id_kendaraans
+                                                            )
+                                                    );
+                                                return (
+                                                    <li key={id_kendaraans}>
+                                                        {kendaraan &&
+                                                            `${kendaraan.nama} (${kendaraan.no_registrasi})`}
+                                                    </li>
+                                                );
+                                            }
+                                        )}
                                     </ul>
                                 </div>
                             )}
@@ -774,10 +859,10 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                         />
                         {pembayaranTotal < data.pembayaran ? (
                             <>
-                            <p className="text-red-700 text-[10px] 2xl:text-xs italic mt-1 ml-1 mb-2">
-                                Pembayaran Melebihi total pembayaran
-                            </p>
-                        </>
+                                <p className="text-red-700 text-[10px] 2xl:text-xs italic mt-1 ml-1 mb-2">
+                                    Pembayaran Melebihi total pembayaran
+                                </p>
+                            </>
                         ) : (
                             <></>
                         )}
@@ -840,8 +925,14 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
                     <div className="flex justify-end space-x-2 border-t pt-4">
                         <button
-                            disabled={processing ?? (pembayaranTotal < data.pembayaran)}
-                            className={`text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md 2xl:rounded-lg text-xs 2xl:text-sm w-full sm:w-auto px-3 py-2 2xl:px-3.5 2xl:py-2.5 text-center ${pembayaranTotal < data.pembayaran ? "bg-slate-500 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800"}`}
+                            disabled={
+                                processing ?? pembayaranTotal < data.pembayaran
+                            }
+                            className={`text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md 2xl:rounded-lg text-xs 2xl:text-sm w-full sm:w-auto px-3 py-2 2xl:px-3.5 2xl:py-2.5 text-center ${
+                                pembayaranTotal < data.pembayaran
+                                    ? "bg-slate-500 cursor-not-allowed"
+                                    : "bg-blue-700 hover:bg-blue-800"
+                            }`}
                         >
                             Submit
                         </button>

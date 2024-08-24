@@ -68,7 +68,6 @@ export default function Edit({ id, handleCloseEdit }) {
                 },
             });
         } catch (err) {
-            console.log("err", err)
             if (err.inner) {
                 const newErrors = {};
                 err.inner.forEach((error) => {
@@ -80,7 +79,6 @@ export default function Edit({ id, handleCloseEdit }) {
             }
         }
     };
-    console.log("errors", errors)
 
     return (
         <>

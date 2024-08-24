@@ -201,7 +201,7 @@ export default function Index({
                                             endDate={state[0].endDate}
                                             selectsRange
                                             customInput={<ExampleCustomInput />}
-                                            dateFormat="dd MMMM yyyy"
+                                            dateFormat="d MMMM yyyy"
                                             locale="id"
                                         />
                                     </div>

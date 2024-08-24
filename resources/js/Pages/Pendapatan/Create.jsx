@@ -23,7 +23,6 @@ export default function Create({
     lastKode,
     handleClose,
 }) {
-    console.log("lastKode", lastKode)
     const modifyString = (str) => {
         let lastThreeDigits = str.slice(-3);
         let incrementedDigits = (parseInt(lastThreeDigits) + 1)
@@ -40,6 +39,7 @@ export default function Create({
         nama: "",
         mulai_tanggal: "",
         akhir_tanggal: "",
+        pengembalian_tanggal: "",
         kendaraan_ids: [],
         total: 0,
         metode: "",
@@ -279,20 +279,18 @@ export default function Create({
                 },
             });
         } catch (err) {
-            console.log("err", err)
             if (err.inner) {
                 const newErrors = {};
                 err.inner.forEach((error) => {
                     newErrors[error.path] = error.message;
                 });
                 setValidationErrors(newErrors);
-                console.log("errors", newErrors)
             } else {
                 toast.error("Terjadi kesalahan dalam validasi data.");
             }
         }
     };
-    console.log("errors", errors)
+
 
     return (
         <>
@@ -327,6 +325,29 @@ export default function Create({
 
                         <div>
                             <label
+                                htmlFor="tanggal Mobil Diambil"
+                                className="block mb-2 font-semibold text-gray-700"
+                            >
+                                Tanggal
+                            </label>
+
+                            <div>
+                                <DatePicker
+                                    selected={startDate1}
+                                    onChange={onChange}
+                                    startDate={new Date()}
+                                    endDate={new Date()}
+                                    selectsRange
+                                    customInput={<ExampleCustomInput />}
+                                    dateFormat="dd MMMM yyyy"
+                                    locale="id"
+                                    readOnly
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
                                 htmlFor="nama"
                                 className="block mb-2 font-semibold text-gray-700"
                             >
@@ -355,7 +376,7 @@ export default function Create({
                                 htmlFor="tanggal Mobil Diambil"
                                 className="block mb-2 font-semibold text-gray-700"
                             >
-                                Tanggal Mobil Diambil
+                                Tanggal Ambil
                             </label>
 
                             <div>

@@ -45,7 +45,6 @@ export default function Create({ handleClose }) {
                 },
             });
         } catch (err) {
-            console.log("err", err)
             if (err.inner) {
                 const newErrors = {};
                 err.inner.forEach((error) => {
@@ -57,8 +56,6 @@ export default function Create({ handleClose }) {
             }
         }
     };
-
-    console.log("errors", errors)
 
     return (
         <>
