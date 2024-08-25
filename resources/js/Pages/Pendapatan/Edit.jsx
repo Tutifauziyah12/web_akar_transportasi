@@ -200,7 +200,6 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
     const [startDatePengembalian, setStartDatePengembalian] = useState(null);
     const [date, setDate] = useState(null);
 
-
     useEffect(() => {
         if (sewa) {
             const parseDate = (dateString) => {
@@ -210,7 +209,9 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
             setStartDate(parseDate(sewa.mulai_tanggal));
             setEndDate(parseDate(sewa.akhir_tanggal));
-            setStartDatePengembalian(parseDate(sewa.pengembalian_tanggal));
+            if (sewa.pengembalian_tanggal || !sewa.pengembalian_tanggal === "") {
+                setStartDatePengembalian(parseDate(sewa.pengembalian_tanggal));
+            }
             setDate(parseDate(sewa.created_at));
         }
     }, [sewa]);
@@ -304,6 +305,7 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
             pembayaran: parseRupiah(value),
         }));
     };
+
     const handleRupiahInputChangeTotal = (event) => {
         const { value } = event.target;
         setData((prevData) => ({
@@ -313,26 +315,17 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
     };
 
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => {
-        const formattedValue = (dateStr) => {
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return "";
-            return date.toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-            });
-        };
-
         const renderedValues = () => {
             if (!value) return "";
             const [start, end] = value.split(" - ");
-            const formattedStart = formattedValue(start);
-            const formattedEnd = formattedValue(end);
+            // const formattedStart = formattedValue(start);
+            // const formattedEnd = formattedValue(end);
             if (!end || start === end) {
-                return formattedStart;
+                return start;
             }
-            return `${formattedStart} - ${formattedEnd}`;
+            return `${start} - ${end}`;
         };
+
         return (
             <input
                 type="text"
@@ -603,6 +596,15 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                                             </li>
                                         )}
                                     </ul>
+                                </div>
+                                <div className="flex justify-end mt-2 mr-2">
+                                    <button
+                                        type="button"
+                                        onClick={toggleDropdown}
+                                        className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-2 py-1.5 text-center mb-2"
+                                    >
+                                        Selesai
+                                    </button>
                                 </div>
                             </div>
 

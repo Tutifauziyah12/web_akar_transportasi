@@ -18,11 +18,7 @@ setDefaultLocale("id");
 
 import { validationSchema } from "@/Utils/validationSchema";
 
-export default function Create({
-    kendaraans,
-    lastKode,
-    handleClose,
-}) {
+export default function Create({ kendaraans, lastKode, handleClose }) {
     const modifyString = (str) => {
         let lastThreeDigits = str.slice(-3);
         let incrementedDigits = (parseInt(lastThreeDigits) + 1)
@@ -291,7 +287,6 @@ export default function Create({
         }
     };
 
-
     return (
         <>
             <Head title="Tambah Sewa Kendaraan" />
@@ -449,7 +444,9 @@ export default function Create({
                                             filteredKendaraans.map(
                                                 (kendaraan) => (
                                                     <li
-                                                        key={kendaraan.id_kendaraans}
+                                                        key={
+                                                            kendaraan.id_kendaraans
+                                                        }
                                                         className="px-4 py-2"
                                                     >
                                                         <div className="flex items-center">
@@ -491,6 +488,15 @@ export default function Create({
                                         )}
                                     </ul>
                                 </div>
+                                <div className="flex justify-end mt-2 mr-2">
+                                    <button
+                                        type="button"
+                                        onClick={toggleDropdown}
+                                        className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-2 py-1.5 text-center mb-2"
+                                    >
+                                        Selesai
+                                    </button>
+                                </div>
                             </div>
 
                             {data.kendaraan_ids.length > 0 && (
@@ -499,17 +505,24 @@ export default function Create({
                                         Kendaraan Dipilih
                                     </label>
                                     <ul className="list-disc list-inside">
-                                        {data.kendaraan_ids.map((id_kendaraans) => {
-                                            const kendaraan = kendaraans.find(
-                                                (k) => k.id_kendaraans === parseInt(id_kendaraans)
-                                            );
-                                            return (
-                                                <li key={id_kendaraans}>
-                                                    {kendaraan &&
-                                                        `${kendaraan.nama} (${kendaraan.no_registrasi})`}
-                                                </li>
-                                            );
-                                        })}
+                                        {data.kendaraan_ids.map(
+                                            (id_kendaraans) => {
+                                                const kendaraan =
+                                                    kendaraans.find(
+                                                        (k) =>
+                                                            k.id_kendaraans ===
+                                                            parseInt(
+                                                                id_kendaraans
+                                                            )
+                                                    );
+                                                return (
+                                                    <li key={id_kendaraans}>
+                                                        {kendaraan &&
+                                                            `${kendaraan.nama} (${kendaraan.no_registrasi})`}
+                                                    </li>
+                                                );
+                                            }
+                                        )}
                                     </ul>
                                 </div>
                             )}
