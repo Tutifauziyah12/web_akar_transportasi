@@ -91,8 +91,6 @@ class DatabaseSeeder extends Seeder
                 'akhir_tanggal' => '2024-07-21',
                 'pengembalian_tanggal' => '2024-07-21',
                 'total' => 1300000,
-                'pembayaran' => 1300000,
-                'metode' => 'Cash',
                 'created_at' => '2024-07-20 06:24:49',
                 'updated_at' => '2024-07-20 06:24:49',
             ],
@@ -103,8 +101,6 @@ class DatabaseSeeder extends Seeder
                 'akhir_tanggal' => '2024-07-23',
                 'pengembalian_tanggal' => '2024-07-21',
                 'total' => 750000,
-                'pembayaran' => 900000,
-                'metode' => 'Debit',
                 'created_at' => '2024-07-21 06:25:38',
                 'updated_at' => '2024-07-21 06:25:38',
             ],
@@ -115,14 +111,55 @@ class DatabaseSeeder extends Seeder
                 'akhir_tanggal' => '2024-07-21',
                 'pengembalian_tanggal' => '2024-07-21',
                 'total' => 650000,
-                'pembayaran' => 500000,
-                'metode' => 'Cash',
                 'created_at' => '2024-07-20 06:26:23',
                 'updated_at' => '2024-07-20 06:26:23',
             ],
         ]);
 
-        /** Seeder pengeluaran */
+        /** Seeder history Pembayaran */
+        DB::table('history_pembayaran')->insert([
+            [
+                'id_history_pembayaran' => 1,
+                'sewa_id' => "PS24001",
+                'total' => 1300000,
+                'metode' => 'Cash',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
+            ],
+            [
+                'id_history_pembayaran' => 2,
+                'sewa_id' => "PS24003",
+                'total' => 100000,
+                'metode' => 'Debit',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
+            ],
+            [
+                'id_history_pembayaran' => 3,
+                'sewa_id' => "PS24002",
+                'total' => 100000,
+                'metode' => 'Cash',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
+            ],
+            [
+                'id_history_pembayaran' => 4,
+                'sewa_id' => "PS24002",
+                'total' => 650000,
+                'metode' => 'Cash',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
+            ],
+            [
+                'id_history_pembayaran' => 5,
+                'sewa_id' => "PS24003",
+                'total' => 100000,
+                'metode' => 'Debit',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
+            ],
+        ]);
+
         /** Seeder pengeluaran */
         DB::table('pengeluarans')->insert([
             [

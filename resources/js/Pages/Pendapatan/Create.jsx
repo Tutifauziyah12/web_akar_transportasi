@@ -275,6 +275,7 @@ export default function Create({ kendaraans, lastKode, handleClose }) {
                 },
             });
         } catch (err) {
+
             if (err.inner) {
                 const newErrors = {};
                 err.inner.forEach((error) => {

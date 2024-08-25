@@ -162,8 +162,6 @@ export default function Index({
         Inertia.get(route("sewa.show", kode));
     };
 
-    const totalPendapatan = 0;
-
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -394,39 +392,95 @@ export default function Index({
                                                 )}
                                             </td>
                                             <td className="px-3 py-2">
-                                                {swa.total +
+                                                {swa.history_pembayaran.reduce(
+                                                    (accumulator, current) =>
+                                                        accumulator +
+                                                        current.total,
+                                                    0
+                                                ) +
                                                     swa.pendapatan_lainnya.reduce(
-                                                        (acc, pendapatan) =>
-                                                            acc +
-                                                            pendapatan.total,
+                                                        (
+                                                            accumulator,
+                                                            current
+                                                        ) =>
+                                                            accumulator +
+                                                            current.total,
                                                         0
                                                     ) ===
-                                                swa.pembayaran ? (
+                                                swa.total ? (
                                                     <>
+                                                        {swa.history_pembayaran.map(
+                                                            (sk, idx) => (
+                                                                <div
+                                                                    key={`${swa.id_sewa}-${idx}`}
+                                                                    className="mb-1 text-nowrap"
+                                                                >
+                                                                    <RupiahFormat
+                                                                        value={
+                                                                            sk.total
+                                                                        }
+                                                                    />{" "}
+                                                                    <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+                                                                        {
+                                                                            sk.metode
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        )}
                                                         <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
                                                             Lunas
-                                                        </span>
-                                                        <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                                                            {swa.metode}
                                                         </span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                                                            Termin
-                                                        </span>
-                                                        <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                                                            {swa.metode}
-                                                        </span>
-                                                        <br />
+                                                        {swa.history_pembayaran.map(
+                                                            (sk, idx) => (
+                                                                <div
+                                                                    key={`${swa.id_sewa}-${idx}`}
+                                                                    className="mb-1 text-nowrap"
+                                                                >
+                                                                    <RupiahFormat
+                                                                        value={
+                                                                            sk.total
+                                                                        }
+                                                                    />{" "}
+                                                                    <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+                                                                        {
+                                                                            sk.metode
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                        Sisa :{" "}
                                                         <RupiahFormat
                                                             value={
-                                                                swa.pembayaran
+                                                                swa.total +
+                                                                swa.pendapatan_lainnya.reduce(
+                                                                    (
+                                                                        accumulator,
+                                                                        current
+                                                                    ) =>
+                                                                        accumulator +
+                                                                        current.total,
+                                                                    0
+                                                                ) -
+                                                                swa.history_pembayaran.reduce(
+                                                                    (
+                                                                        accumulator,
+                                                                        current
+                                                                    ) =>
+                                                                        accumulator +
+                                                                        current.total,
+                                                                    0
+                                                                )
                                                             }
                                                         />
                                                     </>
                                                 )}
                                             </td>
+
                                             <td className="px-1 pr-5 py-2 flex justify-center space-x-2">
                                                 <a
                                                     onClick={() =>

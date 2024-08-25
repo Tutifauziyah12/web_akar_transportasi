@@ -19,8 +19,8 @@ return new class extends Migration
             $table->date('akhir_tanggal');
             $table->date('pengembalian_tanggal')->nullable();
             $table->bigInteger('total');
-            $table->bigInteger('pembayaran');
-            $table->string('metode');
+            // $table->bigInteger('pembayaran');
+            // $table->string('metode');
             $table->timestamps();
 
             $table->foreign('id_sewa')->references('id_kas')->on('kas')->onDelete('cascade');

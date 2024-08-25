@@ -233,12 +233,12 @@ export default function IndexLainnya({
                                                 <FormatDateRange
                                                     startDateString={
                                                         kendaraan.sewa
-                                                            .updated_at
+                                                            .created_at
 
                                                     }
                                                     endDateString={
                                                         kendaraan.sewa
-                                                            .updated_at
+                                                            .created_at
 
                                                     }
                                                 />
@@ -250,10 +250,6 @@ export default function IndexLainnya({
                                                 {kendaraan.jumlah}
                                             </td>
                                             <td className="px-3 py-2">
-                                                <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                                                    {kendaraan.metode}
-                                                </span>
-                                                <br />
                                                 <RupiahFormat
                                                     value={kendaraan.total}
                                                 />{" "}

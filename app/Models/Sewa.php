@@ -20,8 +20,6 @@ class Sewa extends Model
         'akhir_tanggal',
         'pengembalian_tanggal',
         'total',
-        'pembayaran',
-        'metode',
     ];
 
     public function kas()
@@ -37,5 +35,10 @@ class Sewa extends Model
     public function pendapatanLainnya()
     {
         return $this->hasMany(SewaLainnya::class, 'id_sewa_lainnya', 'id_sewa');
+    }
+
+    public function historyPembayaran()
+    {
+        return $this->hasMany(HistoryPembayaran::class, 'sewa_id', 'id_sewa');
     }
 }

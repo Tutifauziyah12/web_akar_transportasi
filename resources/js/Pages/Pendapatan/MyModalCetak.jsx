@@ -19,7 +19,7 @@ const MyModalCetak = ({
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-lg w-1/3 max-h-screen my-8 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg w-2/5 max-h-screen my-8 overflow-hidden">
                 <div className="flex justify-between items-center p-4 border-b">
                     <h2 className="text-lg font-semibold">Cetak Data Sewa Kendaraan</h2>
                     <button

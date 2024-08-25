@@ -29,6 +29,7 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                         ),
                         total: sewaData.total,
                         metode: sewaData.metode,
+                        history_pembayaran_ids: sewaData.history_pembayaran,
                         tipe_pembayaran: sewaData.tipe_pembayaran,
                         pembayaran: sewaData.pembayaran,
                         pendapatanLainnya: sewaData.pendapatan_lainnya,
@@ -48,6 +49,7 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
         akhir_tanggal: "",
         pengembalian_tanggal: "",
         kendaraan_ids: [],
+        history_pembayaran_ids: [],
         total: 0,
         metode: "",
         tipe_pembayaran: "",
@@ -89,6 +91,14 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
         }
     }, [data.tipe_pembayaran, pembayaranTotal]);
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     return (
         <>
             <Head title="Tambah Sewa Kendaraan" />
@@ -126,7 +136,7 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                             Detail Sewa
                         </label>
                     </div>
-                    <table className="">
+                    <table className="w-full">
                         <tbody>
                             <tr>
                                 <td className="font-semibold py-1">Kode</td>
@@ -173,8 +183,12 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                                 <td className="w-10"></td>
                                 <td>
                                     <FormatDateRange
-                                        startDateString={data.pengembalian_tanggal}
-                                        endDateString={data.pengembalian_tanggal}
+                                        startDateString={
+                                            data.pengembalian_tanggal
+                                        }
+                                        endDateString={
+                                            data.pengembalian_tanggal
+                                        }
                                     />
                                 </td>
                             </tr>
@@ -226,8 +240,8 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                                         <></>
                                     ) : (
                                         <>
-                                            <div className=" border-2 border-dashed border-slate-300">
-                                                <div className="grid gap-3 px-2 py-0.5 md:grid-cols-3 2xl:grid-cols-3 relative">
+                                            <div className="border-2 border-dashed border-slate-300">
+                                                <div className="grid gap-3 px-2 py-0.5 grid-cols-3 relative">
                                                     <div className="block mb-1 text-gray-900 font-semibold">
                                                         Sewa Lainnya
                                                     </div>
@@ -243,7 +257,7 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                                                     (pendapatan, index) => (
                                                         <div
                                                             key={index}
-                                                            className="grid gap-3 px-2 py-0.5 md:grid-cols-3 2xl:grid-cols-3 relative"
+                                                            className="grid gap-3 px-2 py-0.5 grid-cols-3 relative"
                                                         >
                                                             <div className="w-full mr-3">
                                                                 <span>
@@ -298,69 +312,91 @@ const Cetak = React.forwardRef(({ kendaraans, handleCloseEdit, kode }, ref) => {
                             </tr>
 
                             <tr>
-                                <td className="font-semibold py-1 ">
-                                    Tipe Pembayaran
+                                <td className="font-semibold py-1 text-left align-top">
+                                    Pembayaran
                                 </td>
                                 <td className="w-10"></td>
                                 <td>
-                                    {data.total +
+                                    {data.history_pembayaran_ids.reduce(
+                                        (accumulator, current) =>
+                                            accumulator + current.total,
+                                        0
+                                    ) +
                                         data.pendapatanLainnya.reduce(
-                                            (acc, item) => acc + item.total,
+                                            (accumulator, current) =>
+                                                accumulator + current.total,
                                             0
                                         ) ===
-                                    data.pembayaran
-                                        ? "Lunas"
-                                        : "Lunas"}
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td className="font-semibold py-1 ">Bayar</td>
-                                <td className="w-10"></td>
-                                <td>
-                                    <RupiahFormat value={data.pembayaran} />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="font-semibold py-1 ">
-                                    Metode Pembayaran
-                                </td>
-                                <td className="w-10"></td>
-                                <td className="">
-                                    <span>{data.metode}</span>
-                                </td>
-                            </tr>
-
-                            {data.total +
-                                data.pendapatanLainnya.reduce(
-                                    (acc, item) => acc + item.total,
-                                    0
-                                ) !==
-                            data.pembayaran ? (
-                                <>
-                                    <tr className="">
-                                        <td className="font-semibold py-1 ">
-                                            Sisa Pembayaran
-                                        </td>
-                                        <td className="w-10"></td>
-                                        <td className="">
+                                    data.total ? (
+                                        <>
+                                            {data.history_pembayaran_ids.map(
+                                                (sk, idx) => (
+                                                    <div
+                                                        key={`${data.id_sewa}-${idx}`}
+                                                        className="mb-1 text-nowrap grid grid-cols-3"
+                                                    >
+                                                        <RupiahFormat
+                                                            value={sk.total}
+                                                        />{" "}
+                                                        <span className="w-fit flex items-center bg-indigo-100 text-indigo-800 font-medium mx-2 px-2.5 py-0.5 rounded">
+                                                        {sk.metode}
+                                                        </span>
+                                                        {formatDate(
+                                                            sk.created_at
+                                                        )}
+                                                    </div>
+                                                )
+                                            )}
+                                            Lunas
+                                        </>
+                                    ) : (
+                                        <>
+                                            {data.history_pembayaran_ids.map(
+                                                (sk, idx) => (
+                                                    <div
+                                                        key={`${data.id_sewa}-${idx}`}
+                                                        className="mb-1 text-nowrap grid grid-cols-3"
+                                                    >
+                                                        <RupiahFormat
+                                                            value={sk.total}
+                                                        />{" "}
+                                                        <span className="w-fit flex items-center bg-indigo-100 text-indigo-800 font-medium mx-2 px-2.5 py-0.5 rounded">
+                                                            {sk.metode}
+                                                        </span>
+                                                        {formatDate(
+                                                            sk.created_at
+                                                        )}
+                                                    </div>
+                                                )
+                                            )}
+                                            Sisa :{" "}
                                             <RupiahFormat
                                                 value={
                                                     data.total +
                                                     data.pendapatanLainnya.reduce(
-                                                        (acc, item) =>
-                                                            acc + item.total,
+                                                        (
+                                                            accumulator,
+                                                            current
+                                                        ) =>
+                                                            accumulator +
+                                                            current.total,
                                                         0
                                                     ) -
-                                                    data.pembayaran
+                                                    data.history_pembayaran_ids.reduce(
+                                                        (
+                                                            accumulator,
+                                                            current
+                                                        ) =>
+                                                            accumulator +
+                                                            current.total,
+                                                        0
+                                                    )
                                                 }
                                             />
-                                        </td>
-                                    </tr>
-                                </>
-                            ) : (
-                                <></>
-                            )}
+                                        </>
+                                    )}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

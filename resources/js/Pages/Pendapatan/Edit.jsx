@@ -2,6 +2,7 @@ import React, { useState, useEffect, forwardRef } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import RupiahInput from "@/Utils/RupiahInput";
+import RupiahFormat from "@/Utils/RupiahFormat";
 import { id } from "date-fns/locale";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -33,7 +34,6 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
                     // Set data form menggunakan respons dari API
                     setData({
-                        created_at: sewaData.created_at,
                         kode: sewaData.id_sewa,
                         nama: sewaData.nama,
                         mulai_tanggal: sewaData.mulai_tanggal,
@@ -44,9 +44,10 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                         ),
                         total: sewaData.total,
                         metode: sewaData.metode,
-                        tipe_pembayaran: sewaData.tipe_pembayaran,
-                        pembayaran: sewaData.pembayaran,
+                        pembayaran: sewaData.pembayaran || 0,
+                        history_pembayaran_ids: sewaData.history_pembayaran,
                         pendapatanLainnya: sewaData.pendapatan_lainnya,
+                        created_at: sewaData.created_at,
                     });
                 })
                 .catch((error) => {
@@ -56,18 +57,19 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
     }, [kode]);
 
     const { data, setData, put, errors, processing, reset } = useForm({
-        created_at: "",
         kode: "",
         nama: "",
         mulai_tanggal: "",
         akhir_tanggal: "",
         pengembalian_tanggal: "",
         kendaraan_ids: [],
+        history_pembayaran_ids: [],
         total: 0,
         metode: "",
         tipe_pembayaran: "",
         pembayaran: 0,
         pendapatanLainnya: [],
+        created_at: "",
     });
 
     const [validationErrors, setValidationErrors] = useState({});
@@ -94,11 +96,6 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
             const updatedPendapatanLainnya = [...data.pendapatanLainnya];
             updatedPendapatanLainnya[index].nama = value;
             setData({ ...data, pendapatanLainnya: updatedPendapatanLainnya });
-        } else if (name.startsWith("metode")) {
-            const metodeIndex = name.split("-")[1];
-            const updatedPendapatanLainnya = [...data.pendapatanLainnya];
-            updatedPendapatanLainnya[index].metode = value;
-            setData({ ...data, pendapatanLainnya: updatedPendapatanLainnya });
         } else {
             const updatedPendapatanLainnya = [...data.pendapatanLainnya];
             updatedPendapatanLainnya[index][name] = value;
@@ -110,7 +107,7 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
         if (data.pendapatanLainnya.length === 0) {
             setData("pendapatanLainnya", [
                 ...data.pendapatanLainnya,
-                { nama: "", jumlah: 0, total: 0, metode: data.metode || "" },
+                { nama: "", jumlah: 0, total: 0 },
             ]);
         } else {
             const isAnyFieldEmpty = data.pendapatanLainnya.some(
@@ -118,8 +115,7 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                     return (
                         !pendapatan.nama ||
                         pendapatan.jumlah <= 0 ||
-                        pendapatan.total <= 0 ||
-                        !pendapatan.metode
+                        pendapatan.total <= 0
                     );
                 }
             );
@@ -133,7 +129,7 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
             setData("pendapatanLainnya", [
                 ...data.pendapatanLainnya,
-                { nama: "", jumlah: 0, total: 0, metode: data.metode || "" },
+                { nama: "", jumlah: 0, total: 0 },
             ]);
         }
     };
@@ -142,6 +138,13 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
         setData(
             "pendapatanLainnya",
             data.pendapatanLainnya.filter((_, i) => i !== index)
+        );
+    };
+
+    const deleteHistoriPendapatan = (index) => {
+        setData(
+            "history_pembayaran_ids",
+            data.history_pembayaran_ids.filter((_, i) => i !== index)
         );
     };
 
@@ -209,7 +212,10 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
 
             setStartDate(parseDate(sewa.mulai_tanggal));
             setEndDate(parseDate(sewa.akhir_tanggal));
-            if (sewa.pengembalian_tanggal || !sewa.pengembalian_tanggal === "") {
+            if (
+                sewa.pengembalian_tanggal ||
+                !sewa.pengembalian_tanggal === ""
+            ) {
                 setStartDatePengembalian(parseDate(sewa.pengembalian_tanggal));
             }
             setDate(parseDate(sewa.created_at));
@@ -293,7 +299,17 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
         return parseInt(value.replace(/[^0-9]/g, ""), 10) || 0;
     };
 
-    const sisaPembayaran = pembayaranTotal - data.pembayaran;
+    const sisaPembayaran =
+        data.total +
+        data.pendapatanLainnya.reduce(
+            (accumulator, current) => accumulator + current.total,
+            0
+        ) -
+        data.history_pembayaran_ids.reduce(
+            (accumulator, current) => accumulator + current.total,
+            0
+        ) -
+        data.pembayaran;
 
     const handleRupiahInputChange = (event) => {
         const { value } = event.target;
@@ -364,6 +380,14 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
             setIsDisabled(false);
         }
     }, [pembayaranTotal, data.pembayaran]);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -819,14 +843,14 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-xs 2xl:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 2xl:p-2.5"
                         />
 
-                        <label
+                        {/* <label
                             htmlFor="Total Pembayaran"
                             className="block mt-4 mb-2 font-medium text-gray-700"
                         >
                             Total Pembayaran
-                        </label>
+                        </label> */}
 
-                        <label className="flex items-center mb-2">
+                        {/* <label className="flex items-center mb-2">
                             <input
                                 type="radio"
                                 id="lunas"
@@ -867,9 +891,9 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                             </>
                         ) : (
                             <></>
-                        )}
+                        )} */}
 
-                        <label
+                        {/* <label
                             htmlFor="Total Pembayaran"
                             className="block mt-4 mb-2 font-medium text-gray-700"
                         >
@@ -905,9 +929,9 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                             <p className="text-red-700 text-[10px] 2xl:text-xs italic mt-1 ml-1 mb-2">
                                 {validationErrors.metode}
                             </p>
-                        )}
+                        )} */}
 
-                        {data.tipe_pembayaran === "Termin" && (
+                        {/* {data.tipe_pembayaran === "Termin" && (
                             <>
                                 <label
                                     htmlFor="Total Pembayaran"
@@ -922,16 +946,207 @@ export default function Edit({ kendaraans, handleCloseEdit, kode }) {
                                     readOnly
                                 />
                             </>
-                        )}
+                        )} */}
+
+                        <label
+                            htmlFor="Total Pembayaran"
+                            className="block mt-4 mb-2 font-medium text-gray-700"
+                        >
+                            Total Pembayaran
+                        </label>
+
+                        <table className="w-full">
+                            <tbody>
+                                <tr>
+                                    <td className="py-1 text-left align-top italic">
+                                        History
+                                    </td>
+                                    <td className="w-4"></td>
+                                    <td>
+                                        {sisaPembayaran === 0 ? (
+                                            <>
+                                                {data.history_pembayaran_ids.map(
+                                                    (sk, idx) => (
+                                                        <div
+                                                            key={`${data.id_sewa}-${idx}`}
+                                                            className="w-full mb-1 grid grid-cols-[100px,auto,auto,40px] 2xl:grid-cols-[130px,auto,auto,40px] items-center gap-2"
+                                                        >
+                                                            <RupiahFormat
+                                                                value={sk.total}
+                                                            />{" "}
+                                                            <span className="w-fit bg-indigo-100 text-indigo-800 font-medium mx-2 px-2.5 py-0.5 rounded">
+                                                                {sk.metode}
+                                                            </span>
+                                                            {formatDate(
+                                                                sk.created_at
+                                                            )}
+                                                            <span
+                                                                className="px-2 flex items-center justify-center hover:text-red-500 hover:font-semibold"
+                                                                onClick={() =>
+                                                                    deleteHistoriPendapatan(
+                                                                        idx
+                                                                    )
+                                                                }
+                                                            >
+                                                                X
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                )}
+                                                Lunas
+                                            </>
+                                        ) : (
+                                            <>
+                                                {data.history_pembayaran_ids.map(
+                                                    (sk, idx) => (
+                                                        <div
+                                                            key={`${data.id_sewa}-${idx}`}
+                                                            className="w-full mb-1 grid grid-cols-[100px,auto,auto,40px] 2xl:grid-cols-[130px,auto,auto,40px] items-center gap-2"
+                                                        >
+                                                            <RupiahFormat
+                                                                value={sk.total}
+                                                                className=""
+                                                            />
+                                                            <span className="w-fit bg-indigo-100 text-indigo-800 font-medium mx-2 px-2.5 py-0.5 rounded">
+                                                                {sk.metode}
+                                                            </span>
+                                                            <span className="">
+                                                                {formatDate(
+                                                                    sk.created_at
+                                                                )}
+                                                            </span>
+                                                            <span
+                                                                className="flex justify-center hover:text-red-500 hover:font-semibold cursor-pointer"
+                                                                onClick={() =>
+                                                                    deleteHistoriPendapatan(
+                                                                        idx
+                                                                    )
+                                                                }
+                                                            >
+                                                                X
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                )}
+                                                Sisa :{" "}
+                                                <RupiahFormat
+                                                    value={sisaPembayaran}
+                                                />
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+
+                                {sisaPembayaran !== 0 ? (
+                                    <>
+                                        {" "}
+                                        <tr>
+                                            <td className="py-1 pt-4 text-left align-top italic">
+                                                Tambah
+                                            </td>
+                                            <td className="w-4"></td>
+                                            <td>
+                                                <input
+                                                    value={formatRupiah(
+                                                        data.pembayaran
+                                                    )}
+                                                    onChange={
+                                                        handleRupiahInputChange
+                                                    }
+                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-xs 2xl:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 2xl:p-2.5 mt-2"
+                                                />
+                                                {sisaPembayaran < 0 ? (
+                                                    <>
+                                                        <p className="text-red-700 text-[10px] 2xl:text-xs italic mt-1 ml-1 mb-2">
+                                                            Pembayaran Melebihi
+                                                            total pembayaran
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <></>
+                                                )}
+                                                <label className="flex items-center mt-2">
+                                                    <input
+                                                        type="radio"
+                                                        id="cash"
+                                                        name="metode"
+                                                        value="Cash"
+                                                        className="mr-2"
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "metode",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        checked={
+                                                            data.metode ===
+                                                            "Cash"
+                                                        }
+                                                    />
+                                                    <span className="text-xs 2xl:text-sm">
+                                                        Cash
+                                                    </span>
+                                                    <input
+                                                        type="radio"
+                                                        id="debit"
+                                                        name="metode"
+                                                        value="Debit"
+                                                        className="mx-2 text-xs"
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "metode",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        checked={
+                                                            data.metode ===
+                                                            "Debit"
+                                                        }
+                                                    />
+                                                    <span className="text-xs 2xl:text-sm">
+                                                        Debit
+                                                    </span>
+                                                </label>
+                                                {(validationErrors.metode ||
+                                                    errors.metode) && (
+                                                    <p className="text-red-700 text-[10px] 2xl:text-xs italic mt-1 ml-1 mb-2">
+                                                        {validationErrors.metode ||
+                                                            errors.metode}
+                                                    </p>
+                                                )}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-1 pt-4 text-left align-top italic">
+                                                Sisa
+                                            </td>
+                                            <td className="w-4"></td>
+                                            <td>
+                                                <input
+                                                    value={formatRupiah(
+                                                        sisaPembayaran
+                                                    )}
+                                                    onChange={
+                                                        handleRupiahInputChange
+                                                    }
+                                                    className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-xs 2xl:text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 2xl:p-2.5"
+                                                    readOnly
+                                                />
+                                            </td>
+                                        </tr>
+                                    </>
+                                ) : (
+                                    <></>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
 
                     <div className="flex justify-end space-x-2 border-t pt-4">
                         <button
-                            disabled={
-                                processing ?? pembayaranTotal < data.pembayaran
-                            }
+                            disabled={processing || sisaPembayaran < 0}
                             className={`text-white  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md 2xl:rounded-lg text-xs 2xl:text-sm w-full sm:w-auto px-3 py-2 2xl:px-3.5 2xl:py-2.5 text-center ${
-                                pembayaranTotal < data.pembayaran
+                                sisaPembayaran < 0
                                     ? "bg-slate-500 cursor-not-allowed"
                                     : "bg-blue-700 hover:bg-blue-800"
                             }`}

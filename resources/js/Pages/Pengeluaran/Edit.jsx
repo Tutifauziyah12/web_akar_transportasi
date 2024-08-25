@@ -299,6 +299,7 @@ export default function Edit({ kode, handleCloseEdit }) {
                                 </p>
                             )}
                         </div>
+                        
                         <div>
                             <label
                                 htmlFor="keterangan"

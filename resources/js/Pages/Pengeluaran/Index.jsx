@@ -309,7 +309,6 @@ export default function Index({
                                                 <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
                                                     {kendaraan.metode}
                                                 </span>
-                                                <br />
                                                 <RupiahFormat
                                                     value={kendaraan.total}
                                                 />
@@ -329,7 +328,7 @@ export default function Index({
                                                 >
                                                     <IoPencil />
                                                 </a>
-                                                <button
+                                                {/* <button
                                                     onClick={() =>
                                                         handleShowDelete(
                                                             kendaraan.id_pengeluarans
@@ -338,7 +337,7 @@ export default function Index({
                                                     className="px-2 text-center hover:text-red-600"
                                                 >
                                                     <IoTrash />
-                                                </button>
+                                                </button> */}
                                             </td>
                                         </tr>
                                     ))

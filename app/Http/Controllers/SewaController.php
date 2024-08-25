@@ -6,6 +6,7 @@ use App\Models\SewaKendaraan;
 use App\Http\Requests\StoreSewaKendaraanRequest;
 use App\Http\Requests\UpdateSewaKendaraanRequest;
 use App\Http\Requests\UpdateSewaRequest;
+use App\Models\HistoryPembayaran;
 use App\Models\Kas;
 use App\Models\Kendaraan;
 use App\Models\Sewa;
@@ -37,7 +38,7 @@ class SewaController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        $sewa = $query->with('sewaKendaraan.kendaraan', 'pendapatanLainnya')->paginate(10);
+        $sewa = $query->with('sewaKendaraan.kendaraan', 'historyPembayaran', 'pendapatanLainnya')->paginate(10);
 
         $kendaraans = Kendaraan::where('status', 'Aktif')->get();
 
@@ -128,7 +129,6 @@ class SewaController extends Controller
                 'akhir_tanggal' => $request->input('akhir_tanggal'),
                 'total' => $request->input('total'),
                 'pembayaran' => $request->input('pembayaran'),
-                'metode' => $request->input('metode'),
             ]);
 
             foreach ($request->input('kendaraan_ids') as $kendaraanId) {
@@ -144,7 +144,6 @@ class SewaController extends Controller
                     'nama' => 'required|string|max:255',
                     'total' => 'required|numeric|min:0',
                     'jumlah' => 'required|integer|min:0',
-                    'metode' => 'required|string|in:Cash,Debit,Kredit',
                 ]);
 
                 if ($validator->fails()) {
@@ -156,9 +155,32 @@ class SewaController extends Controller
                         'nama' => $sewaLainnyaItem['nama'],
                         'total' => $sewaLainnyaItem['total'],
                         'jumlah' => $sewaLainnyaItem['jumlah'],
-                        'metode' => $sewaLainnyaItem['metode'],
                     ]);
                 }
+            }
+
+            $validatorPembayaran = Validator::make($request->all(), [
+                'total' => 'required|numeric|min:0',
+                'metode' => 'required|string|in:Cash,Debit,Kredit',
+            ], [
+                'total.required' => 'Total pembayaran wajib diisi.',
+                'total.numeric' => 'Total pembayaran harus berupa angka.',
+                'total.min' => 'Total pembayaran minimal 0.',
+                'metode.required' => 'Metode pembayaran wajib diisi.',
+                'metode.string' => 'Metode pembayaran harus berupa teks.',
+                'metode.in' => 'Metode pembayaran harus salah satu dari: Cash, Debit, Kredit.',
+            ]);
+
+            if ($validatorPembayaran->fails()) {
+                foreach ($validatorPembayaran->errors()->messages() as $field => $messages) {
+                    $errors[$field] = $messages;
+                }
+            } else {
+                HistoryPembayaran::create([
+                    'sewa_id' => $request['kode'],
+                    'total' => $request->input('pembayaran'),
+                    'metode' => $request->input('metode'),
+                ]);
             }
 
             if (!empty($errors)) {
@@ -180,11 +202,11 @@ class SewaController extends Controller
 
     public function show(Sewa $sewa, $kode)
     {
-        $lastSewa = Sewa::with('sewaKendaraan.kendaraan', 'pendapatanLainnya')
+        $lastSewa = Sewa::with('sewaKendaraan.kendaraan', 'historyPembayaran', 'pendapatanLainnya')
             ->where('id_sewa', 'like', $kode)
             ->orderBy('id_sewa', 'desc')
             ->first();
-        
+
         return response()->json($lastSewa);
     }
 
@@ -216,6 +238,7 @@ class SewaController extends Controller
     public function update(Sewa $sewa, UpdateSewaRequest $request)
     {
         try {
+            // dd($request);
             DB::beginTransaction();
 
             $validated = $request->validated();
@@ -239,7 +262,6 @@ class SewaController extends Controller
                     'nama' => 'required|string|max:255',
                     'total' => 'required|numeric|min:0',
                     'jumlah' => 'required|integer|min:0',
-                    'metode' => 'required|string|in:Cash,Debit,Kredit',
                 ]);
 
                 if ($validator->fails()) {
@@ -250,10 +272,58 @@ class SewaController extends Controller
                         'nama' => $sewaLainnyaItem['nama'],
                         'total' => $sewaLainnyaItem['total'],
                         'jumlah' => $sewaLainnyaItem['jumlah'],
-                        'metode' => $sewaLainnyaItem['metode'],
                     ]);
                 }
             }
+
+            HistoryPembayaran::where('sewa_id', $request['kode'])->delete();
+            // dd($request);
+            foreach ($request->input('history_pembayaran_ids') as $index => $history_pembayaranItem) {
+                $validator = Validator::make($history_pembayaranItem, [
+                    'sewa_id' => 'required|string|max:255',
+                    'total' => 'required|numeric|min:0',
+                    'metode' => 'required|string|in:Cash,Debit,Kredit',
+                ]);
+
+                if ($validator->fails()) {
+                    $errors[$index] = $validator->errors()->all();
+                } else {
+                    HistoryPembayaran::create([
+                        'sewa_id' => $request['kode'],
+                        'total' => $history_pembayaranItem['total'],
+                        'metode' => $history_pembayaranItem['metode'],
+                        'created_at' => $history_pembayaranItem['created_at'],
+                        'updated_at' => $history_pembayaranItem['updated_at'],                        
+                    ]);
+                }
+            }
+
+            if ($request->input('pembayaran') !== 0) {
+                $validatorPembayaran = Validator::make($request->all(), [
+                    'total' => 'required|numeric|min:0',
+                    'metode' => 'required|string|in:Cash,Debit,Kredit',
+                ], [
+                    'total.required' => 'Total pembayaran wajib diisi.',
+                    'total.numeric' => 'Total pembayaran harus berupa angka.',
+                    'total.min' => 'Total pembayaran minimal 0.',
+                    'metode.required' => 'Metode pembayaran wajib diisi.',
+                    'metode.string' => 'Metode pembayaran harus berupa teks.',
+                    'metode.in' => 'Metode pembayaran harus salah satu dari: Cash, Debit, Kredit.',
+                ]);
+    
+                if ($validatorPembayaran->fails()) {
+                    foreach ($validatorPembayaran->errors()->messages() as $field => $messages) {
+                        $errors[$field] = $messages;
+                    }
+                } else {
+                    HistoryPembayaran::create([
+                        'sewa_id' => $request['kode'],
+                        'total' => $request->input('pembayaran'),
+                        'metode' => $request->input('metode'),
+                    ]);
+                }
+            }
+            
 
             if (!empty($errors)) {
                 DB::rollback();

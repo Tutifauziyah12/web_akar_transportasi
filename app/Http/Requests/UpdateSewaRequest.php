@@ -27,9 +27,7 @@ class UpdateSewaRequest extends FormRequest
             'mulai_tanggal' => 'required|date',
             'akhir_tanggal' => 'required|date|after_or_equal:mulai_tanggal',
             'pengembalian_tanggal' => 'nullable|date',
-            'total' => 'required|numeric|min:0',
-            'pembayaran' => 'required|numeric|min:0',
-            'metode' => 'required|string|in:Cash,Debit,Kredit',
+            'total' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -59,17 +57,9 @@ class UpdateSewaRequest extends FormRequest
 
             'pengembalian_tanggal.date' => 'Format tanggal pengembalian tidak valid.',
 
-            'total.required' => 'Total harus diisi.',
+            // 'total.required' => 'Total harus diisi.',
             'total.numeric' => 'Total harus berupa angka.',
             'total.min' => 'Total tidak boleh kurang dari :min.',
-
-            'pembayaran.required' => 'Pembayaran harus diisi.',
-            'pembayaran.numeric' => 'Pembayaran harus berupa angka.',
-            'pembayaran.min' => 'Pembayaran tidak boleh kurang dari :min.',
-
-            'metode.required' => 'Metode pembayaran harus dipilih.',
-            'metode.string' => 'Metode pembayaran harus berupa teks.',
-            'metode.in' => 'Metode pembayaran harus salah satu dari: Cash, Debit, Kredit.',
         ];
     }
 };
