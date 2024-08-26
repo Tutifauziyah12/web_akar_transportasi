@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kas;
 use App\Http\Requests\StoreKasRequest;
 use App\Http\Requests\UpdateKasRequest;
+use App\Models\HistoryPembayaran;
 use App\Models\Pengeluaran;
 use App\Models\Sewa;
 use Illuminate\Http\Request;
@@ -62,25 +63,20 @@ class KasController extends Controller
 
     public function indexPendapatan(Request $request)
     {
-        $query = Sewa::query();
-
-        if ($request->filled('startDate') && $request->filled('endDate')) {
-            $startDate = date('Y-m-d 00:00:00', strtotime($request->input('startDate')));
-            $endDate = date('Y-m-d 23:59:59', strtotime($request->input('endDate')));
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        }
+        $query = HistoryPembayaran::query();
 
         $searchTerm = $request->input('search', '');
-        $category = $request->input('category', 'semua');
-
         if ($searchTerm !== '') {
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('id_sewa', 'like', '%' . $searchTerm . '%')
-                    ->orWhereHas('sewaKendaraan.kendaraan', function ($q) use ($searchTerm) {
+                $q->where('sewa_id', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('sewa', function ($q) use ($searchTerm) {
+                        $q->where('nama', 'like', '%' . $searchTerm . '%');
+                    })
+                    ->orWhereHas('sewa.sewaKendaraan.kendaraan', function ($q) use ($searchTerm) {
                         $q->where('nama', 'like', '%' . $searchTerm . '%')
                             ->orWhere('no_registrasi', 'like', '%' . $searchTerm . '%');
                     })
-                    ->orWhereHas('pendapatanLainnya', function ($q) use ($searchTerm) {
+                    ->orWhereHas('sewa.pendapatanLainnya', function ($q) use ($searchTerm) {
                         $q->where('nama', 'like', '%' . $searchTerm . '%')
                             ->orWhere('metode', 'like', '%' . $searchTerm . '%')
                             ->orWhere('total', 'like', '%' . $searchTerm . '%');
@@ -88,15 +84,13 @@ class KasController extends Controller
             });
         }
 
-        if ($category !== 'semua') {
-            if ($category === 'pendapatan_sewa') {
-                $query->whereHas('sewaKendaraan');
-            } elseif ($category === 'pendapatan_lainnya') {
-                $query->whereHas('pendapatanLainnya');
-            }
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $startDate = date('Y-m-d 00:00:00', strtotime($request->input('startDate')));
+            $endDate = date('Y-m-d 23:59:59', strtotime($request->input('endDate')));
+            $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        $sewa = $query->with(['sewaKendaraan.kendaraan', 'pendapatanLainnya'])->get();
+        $sewa = $query->with('sewa.sewaKendaraan.kendaraan', 'sewa.pendapatanLainnya', 'sewa.historyPembayaran')->orderBy('created_at', 'asc')->get();
 
         return Inertia::render('Kas/IndexPendapatan', [
             'status' => session('status'),

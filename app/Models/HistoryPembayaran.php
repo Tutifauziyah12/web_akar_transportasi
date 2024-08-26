@@ -25,4 +25,9 @@ class HistoryPembayaran extends Model
     {
         return $this->hasMany(HistoryPembayaran::class);
     }
+
+    public function sewa()
+    {
+        return $this->belongsTo(Sewa::class, 'sewa_id');
+    }
 }

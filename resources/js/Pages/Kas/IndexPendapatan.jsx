@@ -23,7 +23,7 @@ export default function IndexPendapatan({
     searchTerm: initialSearchTerm,
     startDate: initialStartDate,
     endDate: initialEndDate,
-    category: initialCategory,
+    // category: initialCategory,
 }) {
     const componentRef = useRef();
 
@@ -33,9 +33,9 @@ export default function IndexPendapatan({
 
     const [formattedDateRange, setFormattedDateRange] = useState("");
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm || "");
-    const [categoryInput, setCategoryInput] = useState(
-        initialCategory || "semua"
-    );
+    // const [categoryInput, setCategoryInput] = useState(
+    //     initialCategory || "semua"
+    // );
     const [state, setState] = useState([
         {
             startDate: initialStartDate ? new Date(initialStartDate) : null,
@@ -96,11 +96,12 @@ export default function IndexPendapatan({
             search: searchTerm,
             startDate,
             endDate,
-            category: categoryInput,
         };
 
         Inertia.get(route("kasPendapatan.index"), filterParams);
     };
+
+    console.log("sewa", sewa)
 
     return (
         <AuthenticatedLayout
@@ -159,7 +160,7 @@ export default function IndexPendapatan({
                                     />
                                 </div>
 
-                                <div className="w-36 2xl:w-48">
+                                {/* <div className="w-36 2xl:w-48">
                                     <select
                                         id="category"
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-xs 2xl:text-base rounded-md 2xl:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 2xl:p-2"
@@ -178,7 +179,7 @@ export default function IndexPendapatan({
                                             Pendapatan Lainnya
                                         </option>
                                     </select>
-                                </div>
+                                </div> */}
 
                                 <div className="flex items-center space-x-2">
                                     <button
@@ -205,7 +206,7 @@ export default function IndexPendapatan({
                 <PrintPendapatanTable
                     ref={componentRef}
                     sewa={sewa}
-                    category={categoryInput}
+                    // category={categoryInput}
                     formattedDateRange={formattedDateRange}
                     date={state}
                 />

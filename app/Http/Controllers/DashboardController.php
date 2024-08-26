@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HistoryPembayaran;
 use App\Models\Kendaraan;
 use App\Models\Pengeluaran;
 use App\Models\Sewa;
@@ -26,33 +27,26 @@ class DashboardController extends Controller
         // })
         //     ->count();
 
-        $totalUangSewaKendaraan = Sewa::whereDate('mulai_tanggal', $today)
-            ->sum('pembayaran');
-        $totalUangLainnya = Sewa::whereDate('mulai_tanggal', $today)
-            ->with('pendapatanLainnya')
-            ->get()
-            ->flatMap(function ($sewa) {
-                return $sewa->pendapatanLainnya;
-            })
-            ->sum('pembayaran');
-        $totalUangMasukHariIni = $totalUangSewaKendaraan + $totalUangLainnya;
+        $totalUangMasukHariIni = HistoryPembayaran::whereDate('created_at', $today)
+            ->sum('total');
+        // dd($totalUangSewaKendaraan);
+        // $totalUangLainnya = Sewa::whereDate('mulai_tanggal', $today)
+        //     ->with('pendapatanLainnya')
+        //     ->get()
+        //     ->flatMap(function ($sewa) {
+        //         return $sewa->pendapatanLainnya;
+        //     })
+        //     ->sum('pembayaran');
+        // $totalUangMasukHariIni = $totalUangSewaKendaraan + $totalUangLainnya;
 
         $totalUangKeluarHariIni = Pengeluaran::whereDate('tanggal', $today)
             ->sum('total');
 
-        $totalUangMasukBulanIni = Sewa::where(function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->whereBetween('mulai_tanggal', [$startOfMonth, $endOfMonth])
-                ->orWhereBetween('akhir_tanggal', [$startOfMonth, $endOfMonth]);
+        $totalUangMasukBulanIni = HistoryPembayaran::where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                ->orWhereBetween('created_at', [$startOfMonth, $endOfMonth]);
         })
-            ->with('pendapatanLainnya')
-            ->get()
-            ->flatMap(function ($sewa) {
-                return array_merge(
-                    [$sewa->pembayaran],
-                    $sewa->pendapatanLainnya->pluck('pembayaran')->toArray()
-                );
-            })
-            ->sum();
+            ->sum('total');
 
         $totalUangKeluarBulanIni = Pengeluaran::whereBetween('tanggal', [$startOfMonth, $endOfMonth])
             ->sum('total');
