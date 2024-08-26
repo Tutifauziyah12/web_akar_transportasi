@@ -14,41 +14,31 @@ class DashboardController extends Controller
     public function index()
     {
         $today = Carbon::today('Asia/Jakarta');
-        // $totalSewaHariIni = Sewa::whereDate('mulai_tanggal', $today)->count();
 
         $endOfMonth = Carbon::now()->endOfMonth();
-        // $sewaAktifSampaiAkhirBulan = Sewa::whereDate('akhir_tanggal', '>', $today)
-        //     ->whereDate('akhir_tanggal', '<=', $endOfMonth)
-        //     ->count();
+
         $startOfMonth = Carbon::now()->startOfMonth();
-        // $totalSewaBulanIni = Sewa::where(function ($query) use ($startOfMonth, $endOfMonth) {
-        //     $query->whereDate('mulai_tanggal', '>=', $startOfMonth)
-        //         ->orWhereDate('akhir_tanggal', '<=', $endOfMonth);
-        // })
-        //     ->count();
 
         $totalUangMasukHariIni = HistoryPembayaran::whereDate('created_at', $today)
-            ->sum('total');
-        // dd($totalUangSewaKendaraan);
-        // $totalUangLainnya = Sewa::whereDate('mulai_tanggal', $today)
-        //     ->with('pendapatanLainnya')
-        //     ->get()
-        //     ->flatMap(function ($sewa) {
-        //         return $sewa->pendapatanLainnya;
-        //     })
-        //     ->sum('pembayaran');
-        // $totalUangMasukHariIni = $totalUangSewaKendaraan + $totalUangLainnya;
-
-        $totalUangKeluarHariIni = Pengeluaran::whereDate('tanggal', $today)
+            ->whereHas('pengeluaran', function ($query) {
+                $query->where('sewa_id', 'like', 'PS%');
+            })
             ->sum('total');
 
-        $totalUangMasukBulanIni = HistoryPembayaran::where(function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-                ->orWhereBetween('created_at', [$startOfMonth, $endOfMonth]);
-        })
+        $totalUangKeluarHariIni = HistoryPembayaran::whereDate('created_at', $today)
+            ->whereHas('pengeluaran', function ($query) {
+                $query->where('pengeluaran_id', 'like', 'P%')
+                    ->where('pengeluaran_id', 'not like', 'PS%');
+            })
             ->sum('total');
 
-        $totalUangKeluarBulanIni = Pengeluaran::whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+        $totalUangMasukBulanIni = HistoryPembayaran::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->where('sewa_id', 'like', 'PS%')
+            ->sum('total');
+
+        $totalUangKeluarBulanIni = HistoryPembayaran::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->where('pengeluaran_id', 'like', 'P%')
+            ->where('pengeluaran_id', 'not like', 'PS%')
             ->sum('total');
 
 
@@ -61,9 +51,6 @@ class DashboardController extends Controller
             ->count();
 
         return Inertia::render('Dashboard', [
-            // 'totalSewaHariIni' => $totalSewaHariIni,
-            // 'sewaAktifSampaiAkhirBulan' => $sewaAktifSampaiAkhirBulan,
-            // 'totalSewaBulanIni' => $totalSewaBulanIni,
             'kendaraanAktif' => $kendaraanAktif,
             'kendaraanPerbaikan' => $kendaraanPerbaikan,
             'kendaraanTidakAktif' => $kendaraanTidakAktif,

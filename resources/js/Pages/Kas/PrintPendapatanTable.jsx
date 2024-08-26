@@ -7,46 +7,6 @@ const PrintPendapatanTable = React.forwardRef(
         let number = 1;
         const totalPembayaran = sewa.reduce((acc, item) => acc + item.total, 0);
 
-        // let totalPendapatan = 0;
-        // sewa.forEach((item) => {
-        //     if (category === "semua") {
-        //         const totalPendapatanLainnya = item.pendapatan_lainnya.reduce(
-        //             (acc, pendapatan) => acc + pendapatan.total,
-        //             0
-        //         );
-        //         const totalKeseluruhan = item.total + totalPendapatanLainnya;
-
-        //         if (totalKeseluruhan === item.pembayaran) {
-        //             totalPendapatan += totalKeseluruhan;
-        //         } else {
-        //             totalPendapatan += item.pembayaran;
-        //         }
-        //     } else if (category === "pendapatan_sewa") {
-        //         if (item.total === item.pembayaran) {
-        //             totalPendapatan += item.total;
-        //         } else if (item.total < item.pembayaran) {
-        //             totalPendapatan += item.total;
-        //         } else {
-        //             totalPendapatan += item.pembayaran;
-        //         }
-        //     } else if (category === "pendapatan_lainnya") {
-        //         const totalPendapatanLainnya = item.pendapatan_lainnya.reduce(
-        //             (acc, pendapatan) => acc + pendapatan.total,
-        //             0
-        //         );
-
-        //         if (totalPendapatanLainnya === item.pembayaran) {
-        //             totalPendapatan += totalPendapatanLainnya;
-        //         } else if (item.total > item.pembayaran) {
-        //             totalPendapatan += 0;
-        //         } else {
-        //             totalPendapatan += item.pembayaran - item.total;
-        //         }
-        //     } else {
-        //         totalPendapatan = 0;
-        //     }
-        // });
-
         return (
             <div ref={ref} className="print:my-10 print:mx-20 print:text-[9px]">
                 {/* <div className="text-center font-semibold mb-6 text-xl 2xl:text-2xl">
@@ -228,6 +188,7 @@ const PrintPendapatanTable = React.forwardRef(
                                                     />
                                                 </>
                                             )}
+                                            {/* {item.sewa.total} */}
                                         </td>
                                         <td className="px-3 py-2">
                                             <span className="bg-indigo-100 text-indigo-800 font-medium me-2 px-2.5 py-0.5 rounded">

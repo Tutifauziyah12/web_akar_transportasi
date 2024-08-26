@@ -90,7 +90,7 @@ class KasController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        $sewa = $query->with('sewa.sewaKendaraan.kendaraan', 'sewa.pendapatanLainnya', 'sewa.historyPembayaran')->orderBy('created_at', 'asc')->get();
+        $sewa = $query->with('sewa.sewaKendaraan.kendaraan', 'sewa.pendapatanLainnya', 'sewa.historyPembayaran')->where('sewa_id', 'like', 'PS%')->orderBy('created_at', 'asc')->get();
 
         return Inertia::render('Kas/IndexPendapatan', [
             'status' => session('status'),
@@ -111,9 +111,7 @@ class KasController extends Controller
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('id_pengeluarans', 'like', '%' . $searchTerm . '%')
                     ->orWhere('nama', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('keterangan', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('total', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('metode', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('keterangan', 'like', '%' . $searchTerm . '%');
             });
         }
 
@@ -121,12 +119,13 @@ class KasController extends Controller
             $startDate = date('Y-m-d', strtotime($request->input('startDate')));
             $endDate = date('Y-m-d', strtotime($request->input('endDate')));
 
-            $query->whereBetween('tanggal', [$startDate, $endDate]);
+            $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
         $query->orderByDesc('id_pengeluarans');
 
-        $pengeluaran = $query->get();
+        $pengeluaran = $query->with('historyPembayaran')->where('id_pengeluarans', 'like', 'P%')
+            ->where('id_pengeluarans', 'not like', 'PS%')->get();
 
         return Inertia::render('Kas/IndexPengeluaran', [
             'status' => session('status'),

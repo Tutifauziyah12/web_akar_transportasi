@@ -39,6 +39,6 @@ class Sewa extends Model
 
     public function historyPembayaran()
     {
-        return $this->hasOne(HistoryPembayaran::class, 'sewa_id', 'id_sewa');
+        return $this->hasMany(HistoryPembayaran::class, 'sewa_id', 'id_sewa');
     }
 }

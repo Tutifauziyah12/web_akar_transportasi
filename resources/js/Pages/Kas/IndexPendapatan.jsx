@@ -101,8 +101,6 @@ export default function IndexPendapatan({
         Inertia.get(route("kasPendapatan.index"), filterParams);
     };
 
-    console.log("sewa", sewa)
-
     return (
         <AuthenticatedLayout
             user={auth.user}

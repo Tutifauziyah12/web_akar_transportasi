@@ -480,7 +480,11 @@ export default function Index({
                                                     </>
                                                 )}
                                             </td>
-
+                                            {/* {swa.history_pembayaran.reduce(
+                                                (accumulator, current) =>
+                                                    accumulator + current.total,
+                                                0
+                                            )} */}
                                             <td className="px-1 pr-5 py-2 flex justify-center space-x-2">
                                                 <a
                                                     onClick={() =>

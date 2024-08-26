@@ -4,10 +4,12 @@ import FormatDateRange from "@/Utils/FormatDateRange";
 
 const PrintPengeluaranTable = React.forwardRef(
     ({ pengeluaran, formattedDateRange, date }, ref) => {
-        let totalPengeluaran = 0;
-        pengeluaran.forEach((item) => {
-            totalPengeluaran += item.total;
-        });
+        const totalPengeluaran = pengeluaran.reduce((acc, item) => {
+            const totalHistoryPembayaran = item.history_pembayaran.reduce((sum, pembayaran) => {
+                return sum + pembayaran.total;
+            }, 0);
+            return acc + totalHistoryPembayaran;
+        }, 0);
 
         return (
             <div ref={ref} className="print:my-10 print:mx-20 print:text-[9px]">
@@ -58,8 +60,8 @@ const PrintPengeluaranTable = React.forwardRef(
                                         </td>
                                         <td className="px-3 py-2">
                                             <FormatDateRange
-                                                startDateString={item.tanggal}
-                                                endDateString={item.tanggal}
+                                                startDateString={item.created_at}
+                                                endDateString={item.created_at}
                                             />
                                         </td>
                                         <td className="px-3 py-2">
@@ -74,10 +76,9 @@ const PrintPengeluaranTable = React.forwardRef(
 
                                         <td className="px-3 py-2">
                                             <span className="bg-indigo-100 text-indigo-800 font-medium me-2 px-2.5 py-0.5 rounded">
-                                                {item.metode}
+                                                {item.history_pembayaran[0].metode}
                                             </span>
-                                            <br />
-                                            <RupiahFormat value={item.total} />
+                                            <RupiahFormat value={item.history_pembayaran[0].total} />
                                         </td>
                                     </tr>
                                 </React.Fragment>
