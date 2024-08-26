@@ -20,4 +20,9 @@ class Pengeluaran extends Model
         'total',
         'metode',
     ];
+
+    public function historyPembayaran()
+    {
+        return $this->hasMany(HistoryPembayaran::class, 'pengeluaran_id', 'id_pengeluarans');
+    }
 }

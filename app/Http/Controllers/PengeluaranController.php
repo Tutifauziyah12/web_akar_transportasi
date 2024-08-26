@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengeluaran;
 use App\Http\Requests\StorePengeluaranRequest;
 use App\Http\Requests\UpdatePengeluaranRequest;
+use App\Models\HistoryPembayaran;
 use App\Models\Kas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,8 +29,7 @@ class PengeluaranController extends Controller
                 $q->where('id_pengeluarans', 'like', '%' . $searchTerm . '%')
                     ->orWhere('nama', 'like', '%' . $searchTerm . '%')
                     ->orWhere('keterangan', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('total', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('metode', 'like', '%' . $searchTerm . '%');
+                ;
             });
         }
 
@@ -39,10 +39,10 @@ class PengeluaranController extends Controller
             $startDate = date('Y-m-d', strtotime($request->input('startDate')));
             $endDate = date('Y-m-d', strtotime($request->input('endDate')));
 
-            $query->whereBetween('tanggal', [$startDate, $endDate]);
+            $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        $pengeluaran = $query->paginate(10);
+        $pengeluaran = $query->with('historyPembayaran')->paginate(10);
 
         $lastSewa = Pengeluaran::where('id_pengeluarans', 'like', 'P24%')->orderBy('id_pengeluarans', 'desc')->first();
         $lastKode = $lastSewa ? $lastSewa->id_pengeluarans : "P24000";
@@ -81,18 +81,20 @@ class PengeluaranController extends Controller
             $validated = $request->validated();
 
             $kas = Kas::create([
-                'id_kas' => $request['kode'], // Metode untuk menghasilkan kode kas unik
+                'id_kas' => $request['kode'],
             ]);
 
-            $pengeluaran = new Pengeluaran();
-            $pengeluaran->id_pengeluarans = $validated['kode'];
-            $pengeluaran->tanggal = $validated['tanggal'];
-            $pengeluaran->total = $validated['total'];
-            $pengeluaran->metode = $validated['metode'];
-            $pengeluaran->keterangan = $validated['keterangan'];
-            $pengeluaran->nama = $validated['nama'];
+            $pengeluaran = Pengeluaran::create([
+                'id_pengeluarans' => $request['kode'],
+                'nama' => $validated['nama'],
+                'keterangan' => $validated['keterangan'],
+            ]);
 
-            $pengeluaran->save();
+            HistoryPembayaran::create([
+                'pengeluaran_id' => $request['kode'],
+                'total' => $validated['total'],
+                'metode' => $validated['metode'],
+            ]);
 
             DB::commit();
             return Redirect::route('pengeluaran.index')
@@ -109,6 +111,7 @@ class PengeluaranController extends Controller
     public function show(Pengeluaran $pengeluaran, $kode)
     {
         $lastPengeluaran = Pengeluaran::where('id_pengeluarans', 'like', $kode)
+            ->with('historyPembayaran')
             ->orderBy('id_pengeluarans', 'desc')
             ->first();
 
@@ -136,16 +139,19 @@ class PengeluaranController extends Controller
             $validated = $request->validated();
             $pengeluaran = Pengeluaran::where('id_pengeluarans', $validated['kode'])->first();
             if ($pengeluaran) {
-                $pengeluaran->tanggal = $validated['tanggal'];
-                $pengeluaran->total = $validated['total'];
-                $pengeluaran->metode = $validated['metode'];
-                $pengeluaran->keterangan = $validated['keterangan'];
                 $pengeluaran->nama = $validated['nama'];
+                $pengeluaran->keterangan = $validated['keterangan'];
 
                 $pengeluaran->save();
             } else {
                 return back()->withInput()->withErrors(['message' => 'Pengeluaran dengan kode tersebut tidak ditemukan.']);
             }
+
+            $historyPembayaran = HistoryPembayaran::where('pengeluaran_id', $pengeluaran->id_pengeluarans)->first();
+            $historyPembayaran->total = $validated['total'];
+            $historyPembayaran->metode = $validated['metode'];
+            $historyPembayaran->save();
+
             DB::commit();
 
             return redirect()->route('pengeluaran.index')->with('message', 'Data pengeluaran berhasil diperbarui.');

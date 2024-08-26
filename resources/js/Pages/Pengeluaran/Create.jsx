@@ -32,7 +32,6 @@ export default function Create({ lastKode, handleClose }) {
     const { data, setData, post, errors, processing, reset } = useForm({
         kode: modifiedString,
         nama: "",
-        tanggal: "",
         total: 0,
         metode: "",
         keterangan: "",
@@ -61,22 +60,6 @@ export default function Create({ lastKode, handleClose }) {
             }
         }
     }, [flash]);
-
-    const formatDateToYYYYMMDD = (date) => {
-        if (!date) return "";
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
-
-    const [startDate, setStartDate] = useState(null);
-
-    const onChange = (date) => {
-        setStartDate(date);
-    };
-
-    data.tanggal = formatDateToYYYYMMDD(startDate);
 
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => {
         const renderedValues = () => {
@@ -123,9 +106,7 @@ export default function Create({ lastKode, handleClose }) {
             }
         }
     };
-
-    const today = new Date();
-
+    
     return (
         <>
             <Head title="Edit Pengeluaran" />
@@ -159,6 +140,31 @@ export default function Create({ lastKode, handleClose }) {
 
                         <div>
                             <label
+                                htmlFor="tanggal"
+                                className="block mb-2 font-semibold text-gray-700"
+                            >
+                                Tanggal
+                            </label>
+
+                            <div>
+                                <DatePicker
+                                    selected={new Date()}
+                                    customInput={<ExampleCustomInput />}
+                                    dateFormat="dd MMMM yyyy"
+                                    locale="id"
+                                    readOnly
+                                />
+                            </div>
+
+                            {validationErrors.tanggal && (
+                                <p className="text-red-700 text-[10px] 2xl:text-xs mt-1 ml-1 italic">
+                                    {validationErrors.tanggal}
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label
                                 htmlFor="nama"
                                 className="block mb-2 font-semibold text-gray-900"
                             >
@@ -184,33 +190,6 @@ export default function Create({ lastKode, handleClose }) {
                             {validationErrors.nama && (
                                 <p className="text-red-700 text-[10px] 2xl:text-xs mt-1 ml-1 italic">
                                     {validationErrors.nama}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="tanggal"
-                                className="block mb-2 font-semibold text-gray-700"
-                            >
-                                Tanggal
-                            </label>
-
-                            <div>
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={onChange}
-                                    startDate={startDate}
-                                    customInput={<ExampleCustomInput />}
-                                    dateFormat="dd MMMM yyyy"
-                                    locale="id"
-                                    minDate={today}
-                                />
-                            </div>
-
-                            {validationErrors.tanggal && (
-                                <p className="text-red-700 text-[10px] 2xl:text-xs mt-1 ml-1 italic">
-                                    {validationErrors.tanggal}
                                 </p>
                             )}
                         </div>

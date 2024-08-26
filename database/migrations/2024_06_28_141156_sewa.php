@@ -12,15 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sewa', function (Blueprint $table) {
-            // $table->id();
             $table->string('id_sewa')->unique();
             $table->string('nama');
             $table->date('mulai_tanggal');
             $table->date('akhir_tanggal');
             $table->date('pengembalian_tanggal')->nullable();
             $table->bigInteger('total');
-            // $table->bigInteger('pembayaran');
-            // $table->string('metode');
             $table->timestamps();
 
             $table->foreign('id_sewa')->references('id_kas')->on('kas')->onDelete('cascade');

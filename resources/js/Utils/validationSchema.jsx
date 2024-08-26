@@ -25,8 +25,6 @@ export const validationSchema = yup.object().shape({
         .number()
         .required("Total harus diisi")
         .min(1, "Total harus lebih besar dari Rp 0"),
-    // tipe_pembayaran: yup.string().required("Tipe Pembayaran harus diisi"),
-    // metode: yup.string().required("Metode harus diisi"),
     pendapatanLainnya: yup.array().of(
         yup.object().shape({
             nama: yup.string().required("Nama harus diisi"),
@@ -39,7 +37,6 @@ export const validationSchema = yup.object().shape({
                 .number()
                 .required("Total harus diisi")
                 .min(1, "Total harus lebih besar dari Rp 0"),
-            // metode: yup.string().required("Metode harus diisi"),
         })
     ),
 });
@@ -52,10 +49,6 @@ export const validationSchemaPengeluaran = yup.object().shape({
         .min(1, "Total harus lebih besar dari Rp 0"),
     metode: yup.string().required("Metode harus diisi"),
     nama: yup.string().required("Nama harus diisi"),
-    tanggal: yup
-        .date()
-        .required("Tanggal harus diisi")
-        .typeError("Tanggal harus berupa tanggal yang valid"),
 });
 
 export const validationSchemaUserCreation = yup.object().shape({

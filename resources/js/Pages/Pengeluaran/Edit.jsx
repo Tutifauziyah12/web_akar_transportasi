@@ -17,13 +17,14 @@ setDefaultLocale("id");
 import { validationSchemaPengeluaran } from "@/Utils/validationSchema";
 
 export default function Edit({ kode, handleCloseEdit }) {
-    const { data, setData, put, processing, reset } = useForm({
+    const { data, setData, put, errors, processing, reset } = useForm({
         kode: "",
         nama: "",
-        tanggal: "",
+        pembayaran: [],
         total: "",
         metode: "",
         keterangan: "",
+        created_at: ""
     });
 
     const [sewa, setSewa] = useState(null);
@@ -38,11 +39,11 @@ export default function Edit({ kode, handleCloseEdit }) {
 
                     setData((prevData) => ({
                         ...prevData,
+                        created_at: sewaData.created_at,
                         kode: sewaData.id_pengeluarans,
                         nama: sewaData.nama,
-                        tanggal: sewaData.tanggal,
-                        total: sewaData.total,
-                        metode: sewaData.metode,
+                        total: sewaData.history_pembayaran[0].total,
+                        metode: sewaData.history_pembayaran[0].metode,
                         keterangan: sewaData.keterangan || "",
                     }));
                 })
@@ -97,20 +98,6 @@ export default function Edit({ kode, handleCloseEdit }) {
         setData({ ...data, total: value });
     };
 
-    const [startDate, setStartDate] = useState(null);
-
-    useEffect(() => {
-        if (sewa && sewa.tanggal) {
-            setStartDate(new Date(sewa.tanggal));
-        }
-    }, [sewa]);
-
-    const onChange = (date) => {
-        setStartDate(date);
-    };
-
-    data.tanggal = formatDateToYYYYMMDD(startDate);
-
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => {
         return (
             <input
@@ -150,8 +137,6 @@ export default function Edit({ kode, handleCloseEdit }) {
         }
     };
 
-    const today = new Date();
-
     return (
         <>
             <Head title="Edit Biaya" />
@@ -180,6 +165,32 @@ export default function Edit({ kode, handleCloseEdit }) {
                                 <div className="text-red-700 text-xs mt-1 ml-1 italic">
                                     {validationErrors.kode}
                                 </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="tanggal"
+                                className="block mb-2 font-semibold text-gray-700"
+                            >
+                                Tanggal
+                            </label>
+
+                            <div>
+                                <DatePicker
+                                    selected={data.created_at}
+                                    customInput={<ExampleCustomInput />}
+                                    dateFormat="dd MMMM yyyy"
+                                    locale={id}
+                                    placeholderText="Pilih tanggal..."
+                                    readOnly
+                                />
+                            </div>
+
+                            {validationErrors.tanggal && (
+                                <p className="text-red-700 text-[10px] 2xl:text-xs mt-1 ml-1 italic">
+                                    {validationErrors.tanggal}
+                                </p>
                             )}
                         </div>
 
@@ -216,33 +227,6 @@ export default function Edit({ kode, handleCloseEdit }) {
 
                         <div>
                             <label
-                                htmlFor="tanggal"
-                                className="block mb-2 font-semibold text-gray-700"
-                            >
-                                Tanggal
-                            </label>
-
-                            <div>
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={onChange}
-                                    customInput={<ExampleCustomInput />}
-                                    dateFormat="dd MMMM yyyy"
-                                    locale={id}
-                                    placeholderText="Pilih tanggal..."
-                                    minDate={today}
-                                />
-                            </div>
-
-                            {validationErrors.tanggal && (
-                                <p className="text-red-700 text-[10px] 2xl:text-xs mt-1 ml-1 italic">
-                                    {validationErrors.tanggal}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label
                                 htmlFor="total"
                                 className="block mb-2 font-semibold text-gray-900 "
                             >
@@ -259,6 +243,7 @@ export default function Edit({ kode, handleCloseEdit }) {
                                     {validationErrors.total}
                                 </p>
                             )}
+                            
                             <div className="flex items-center space-x-4 pt-3">
                                 <label className="flex items-center">
                                     <input

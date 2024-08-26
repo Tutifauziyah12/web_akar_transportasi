@@ -281,7 +281,7 @@ export default function Index({
                                         </td>
                                     </tr>
                                 ) : (
-                                    pengeluaran.data.map((kendaraan, index) => (
+                                    pengeluaran.data.map((item, index) => (
                                         <tr
                                             key={pengeluaran.from + index}
                                             className="bg-white border-b hover:bg-gray-50 align-top"
@@ -290,38 +290,38 @@ export default function Index({
                                                 {pengeluaran.from + index}
                                             </td>
                                             <td className="px-3 py-2">
-                                                {kendaraan.id_pengeluarans}
+                                                {item.id_pengeluarans}
                                             </td>
                                             <td className="px-3 py-2">
                                                 <FormatDateRange
                                                     startDateString={
-                                                        kendaraan.tanggal
+                                                        item.created_at
                                                     }
                                                     endDateString={
-                                                        kendaraan.tanggal
+                                                        item.created_at
                                                     }
                                                 />
                                             </td>
                                             <td className="px-3 py-2">
-                                                {kendaraan.nama}
+                                                {item.nama}
                                             </td>
                                             <td className="px-3 py-2">
                                                 <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-                                                    {kendaraan.metode}
+                                                    {item.history_pembayaran[0].metode}
                                                 </span>
                                                 <RupiahFormat
-                                                    value={kendaraan.total}
+                                                    value={item.history_pembayaran[0].total}
                                                 />
                                                 
                                             </td>
                                             <td className="px-3 py-2">
-                                                {kendaraan.keterangan}
+                                                {item.keterangan}
                                             </td>
                                             <td className="px-1 py-2 flex justify-center space-x-2">
                                                 <a
                                                     onClick={() =>
                                                         handleShowEdit(
-                                                            kendaraan.id_pengeluarans
+                                                            item.id_pengeluarans
                                                         )
                                                     }
                                                     className="px-2 text-center hover:text-yellow-600"

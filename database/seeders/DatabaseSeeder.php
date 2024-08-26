@@ -82,7 +82,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        /** Seeder sewa */
+        // /** Seeder sewa */
         DB::table('sewa')->insert([
             [
                 'id_sewa' => 'PS24001',
@@ -113,6 +113,30 @@ class DatabaseSeeder extends Seeder
                 'total' => 650000,
                 'created_at' => '2024-07-20 06:26:23',
                 'updated_at' => '2024-07-20 06:26:23',
+            ],
+        ]);
+
+        DB::table('pengeluarans')->insert([
+            [
+                'id_pengeluarans' => 'P24001',
+                'nama' => 'Avanza Reborn',
+                'keterangan' => 'Ganti Oli, servis bulanan',
+                'created_at' => '2024-07-16 16:11:38',
+                'updated_at' => '2024-07-16 16:11:38',
+            ],
+            [
+                'id_pengeluarans' => 'P24002',
+                'nama' => 'Biaya Listrik',
+                'keterangan' => 'Pembayaran listrik bulan Juli',
+                'created_at' => '2024-07-17 06:42:52',
+                'updated_at' => '2024-07-17 06:43:14',
+            ],
+            [
+                'id_pengeluarans' => 'P24003',
+                'nama' => 'Kebersihan Mobil',
+                'keterangan' => 'Pencucian dan pembersihan mobil pada cucian mobil',
+                'created_at' => '2024-07-18 06:14:18',
+                'updated_at' => '2024-07-18 06:14:18',
             ],
         ]);
 
@@ -159,40 +183,34 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => '2024-07-20 06:24:49',
             ],
         ]);
-
-        /** Seeder pengeluaran */
-        DB::table('pengeluarans')->insert([
+        DB::table('history_pembayaran')->insert([
             [
-                'id_pengeluarans' => 'P24001', // Use an existing kode from the kas table
-                'nama' => 'Avanza Reborn',
-                'tanggal' => '2024-07-17',
-                'keterangan' => 'Ganti Oli, servis bulanan',
+                'id_history_pembayaran' => 6,
+                'pengeluaran_id' => "P24001",
+                'total' => 100000,
+                'metode' => 'Debit',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
+            ],
+            [
+                'id_history_pembayaran' => 7,
+                'pengeluaran_id' => "P24002",
                 'total' => 1000000,
-                'metode' => 'Cash',
-                'created_at' => '2024-07-16 16:11:38',
-                'updated_at' => '2024-07-16 16:11:38',
+                'metode' => 'Debit',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
             ],
             [
-                'id_pengeluarans' => 'P24002', // Use an existing kode from the kas table
-                'nama' => 'Biaya Listrik',
-                'tanggal' => '2024-07-17',
-                'keterangan' => 'Pembayaran listrik bulan Juli',
+                'id_history_pembayaran' => 8,
+                'pengeluaran_id' => "P24003",
                 'total' => 400000,
-                'metode' => 'Cash',
-                'created_at' => '2024-07-17 06:42:52',
-                'updated_at' => '2024-07-17 06:43:14',
-            ],
-            [
-                'id_pengeluarans' => 'P24003', // Use an existing kode from the kas table
-                'nama' => 'Kebersihan Mobil',
-                'tanggal' => '2024-07-19',
-                'keterangan' => 'Pencucian dan pembersihan mobil pada cucian mobil',
-                'total' => 50000,
-                'metode' => 'Cash',
-                'created_at' => '2024-07-18 06:14:18',
-                'updated_at' => '2024-07-18 06:14:18',
+                'metode' => 'Debit',
+                'created_at' => '2024-07-20 06:24:49',
+                'updated_at' => '2024-07-20 06:24:49',
             ],
         ]);
+
+
 
         /** Seeder sewa_kendaraans */
         DB::table('sewa_kendaraans')->insert([

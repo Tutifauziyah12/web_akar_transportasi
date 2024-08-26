@@ -23,7 +23,6 @@ class StorePengeluaranRequest extends FormRequest
     {
         return [
             'kode' => 'required|string|max:100|not_regex:/^\s*$/',
-            'tanggal' => 'required|date',
             'total' => 'required|numeric|min:0',
             'metode' => 'required|string|in:Cash,Debit,Kredit',
             'keterangan' => 'nullable|string',
@@ -43,9 +42,6 @@ class StorePengeluaranRequest extends FormRequest
             'kode.string' => 'Kode harus berupa teks.',
             'kode.max' => 'Kode tidak boleh lebih dari :max karakter.',
             'kode.not_regex' => 'Format Kode tidak valid.',
-
-            'tanggal.required' => 'Tanggal harus diisi.',
-            'tanggal.date' => 'Format tanggal tidak valid.',
 
             'total.required' => 'Total harus diisi.',
             'total.numeric' => 'Total harus berupa angka.',

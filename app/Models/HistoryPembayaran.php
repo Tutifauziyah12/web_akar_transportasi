@@ -15,6 +15,7 @@ class HistoryPembayaran extends Model
     protected $keyType = 'integer';
     protected $fillable = [
         'id_history_pembayaran',
+        'pengeluaran_id',
         'sewa_id',
         'total',
         'metode',
@@ -27,6 +28,11 @@ class HistoryPembayaran extends Model
     }
 
     public function sewa()
+    {
+        return $this->belongsTo(Sewa::class, 'sewa_id');
+    }
+
+    public function pengeluaran()
     {
         return $this->belongsTo(Sewa::class, 'sewa_id');
     }
