@@ -21,6 +21,11 @@ class Pengeluaran extends Model
         'metode',
     ];
 
+    public function kas()
+    {
+        return $this->belongsTo(Kas::class, 'id_kas', 'id_pengeluarans');
+    }
+
     public function historyPembayaran()
     {
         return $this->hasMany(HistoryPembayaran::class, 'pengeluaran_id', 'id_pengeluarans');

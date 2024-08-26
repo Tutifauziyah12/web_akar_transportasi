@@ -1,12 +1,15 @@
 import React from "react";
 import RupiahFormat from "@/Utils/RupiahFormat";
 import FormatDateRange from "@/Utils/FormatDateRange";
+import Index from "../Admin/Index";
 
 const PrintBukuBesarTable = React.forwardRef(
     ({ kasList, formattedDateRange, date }, ref) => {
         let number = 1;
 
-        let totalPendapatan = 0;
+        let laba = 0;
+
+        console.log("kasList", kasList);
 
         return (
             <div ref={ref} className="print:my-10 print:mx-20 print:text-[9px]">
@@ -55,362 +58,462 @@ const PrintBukuBesarTable = React.forwardRef(
                     </thead>
                     <tbody className="leading-relaxed">
                         {kasList && kasList.length > 0 ? (
+                            // kasList.map((item, index) => (
+                            //     <React.Fragment key={item.id_kas}>
+                            //         {item.id_kas.startsWith("PS") ? (
+                            //             <>
+                            //                 <tr
+                            //                     className="bg-white border-b hover:bg-gray-50 align-top"
+                            //                     key={`row-ps-${item.id}`}
+                            //                 >
+                            //                     <td className="px-8 py-2 w-28">
+                            //                         {index + 1}
+                            //                     </td>
+                            //                     <td className="px-3 py-2">
+                            //                         <FormatDateRange
+                            //                             startDateString={
+                            //                                 item.sewa
+                            //                                     .created_at
+
+                            //                             }
+                            //                             endDateString={
+                            //                                 item.sewa
+                            //                                     .created_at
+
+                            //                             }
+                            //                         />
+                            //                     </td>
+                            //                     <td className="px-3 py-2">
+                            //                         {item.sewa.total +
+                            //                             item.sewa.pendapatan_lainnya.reduce(
+                            //                                 (acc, item) =>
+                            //                                     acc +
+                            //                                     item.total,
+                            //                                 0
+                            //                             ) ===
+                            //                         item.sewa.pembayaran ? (
+                            //                             <>
+                            //                                 <span className="bg-green-100 text-green-800 font-medium me-2 px-2.5 py-0.5 rounded">
+                            //                                     Lunas
+                            //                                 </span>
+                            //                             </>
+                            //                         ) : (
+                            //                             <span className="bg-yellow-100 text-yellow-800 font-medium me-2 px-2.5 py-0.5 rounded">
+                            //                                 Termin
+                            //                             </span>
+                            //                         )}
+                            //                         <span className="font-medium">
+                            //                             {item.id_kas} - Sewa
+                            //                             Kendaraan
+                            //                         </span>
+                            //                         <br />
+                            //                         {item.sewa.sewa_kendaraan
+                            //                             .length > 0 && (
+                            //                             <span>
+                            //                                 {item.sewa.sewa_kendaraan
+                            //                                     .map(
+                            //                                         (
+                            //                                             kendaraan
+                            //                                         ) =>
+                            //                                             `${kendaraan.kendaraan.nama} (${kendaraan.kendaraan.no_registrasi})`
+                            //                                     )
+                            //                                     .join(", ")}
+                            //                             </span>
+                            //                         )}
+                            //                     </td>
+
+                            //                     <td className="px-3 py-2">
+                            //                         {item.sewa.total +
+                            //                             item.sewa.pendapatan_lainnya.reduce(
+                            //                                 (acc, item) =>
+                            //                                     acc +
+                            //                                     item.total,
+                            //                                 0
+                            //                             ) ===
+                            //                         item.sewa.pembayaran ? (
+                            //                             <>
+                            //                                 <RupiahFormat
+                            //                                     value={
+                            //                                         item.sewa
+                            //                                             .total
+                            //                                     }
+                            //                                 />
+                            //                             </>
+                            //                         ) : item.sewa.total >
+                            //                           item.sewa.pembayaran ? (
+                            //                             <>
+                            //                                 <RupiahFormat
+                            //                                     value={
+                            //                                         item.sewa
+                            //                                             .pembayaran
+                            //                                     }
+                            //                                 />
+                            //                             </>
+                            //                         ) : (
+                            //                             <>
+                            //                                 <RupiahFormat
+                            //                                     value={
+                            //                                         item.sewa
+                            //                                             .total
+                            //                                     }
+                            //                                 />
+                            //                             </>
+                            //                         )}
+                            //                     </td>
+                            //                     <td className="px-3 py-2">-</td>
+                            //                     <td className="px-3 py-2">
+                            //                         {item.sewa.total +
+                            //                             item.sewa.pendapatan_lainnya.reduce(
+                            //                                 (acc, item) =>
+                            //                                     acc +
+                            //                                     item.total,
+                            //                                 0
+                            //                             ) ===
+                            //                         item.sewa.pembayaran ? (
+                            //                             <>
+                            //                                 <RupiahFormat
+                            //                                     value={
+                            //                                         (totalPendapatan +=
+                            //                                             item
+                            //                                                 .sewa
+                            //                                                 .total)
+                            //                                     }
+                            //                                 />
+                            //                             </>
+                            //                         ) : item.sewa.total >
+                            //                           item.sewa.pembayaran ? (
+                            //                             <>
+                            //                                 <RupiahFormat
+                            //                                     value={
+                            //                                         (totalPendapatan +=
+                            //                                             item
+                            //                                                 .sewa
+                            //                                                 .pembayaran)
+                            //                                     }
+                            //                                 />
+                            //                             </>
+                            //                         ) : (
+                            //                             <>
+                            //                                 <RupiahFormat
+                            //                                     value={
+                            //                                         (totalPendapatan +=
+                            //                                             item
+                            //                                                 .sewa
+                            //                                                 .total)
+                            //                                     }
+                            //                                 />
+                            //                             </>
+                            //                         )}
+                            //                     </td>
+                            //                 </tr>
+                            //                 {item.sewa.pendapatan_lainnya &&
+                            //                 item.sewa.pendapatan_lainnya
+                            //                     .length > 0 ? (
+                            //                     item.sewa.pendapatan_lainnya.map(
+                            //                         (pendapatan, idx) => (
+                            //                             <tr
+                            //                                 className="bg-white border-b hover:bg-gray-50 align-top"
+                            //                                 key={`row-ps-pendapatan-${item.id}-${idx}`}
+                            //                             >
+                            //                                 <td className="px-3 py-2"></td>
+                            //                                 <td className="px-3 py-2"></td>
+                            //                                 <td className="px-3 py-2">
+                            //                                     {item.sewa
+                            //                                         .total +
+                            //                                         item.sewa.pendapatan_lainnya.reduce(
+                            //                                             (
+                            //                                                 acc,
+                            //                                                 item
+                            //                                             ) =>
+                            //                                                 acc +
+                            //                                                 item.total,
+                            //                                             0
+                            //                                         ) ===
+                            //                                     item.sewa
+                            //                                         .pembayaran ? (
+                            //                                         <>
+                            //                                             <span className="bg-green-100 text-green-800 font-medium me-2 px-2.5 py-0.5 rounded">
+                            //                                                 Lunas
+                            //                                             </span>
+                            //                                         </>
+                            //                                     ) : (
+                            //                                         <span className="bg-yellow-100 text-yellow-800 font-medium me-2 px-2.5 py-0.5 rounded">
+                            //                                             Termin
+                            //                                         </span>
+                            //                                     )}
+                            //                                     <span className="font-semibold">
+                            //                                         {
+                            //                                             item.id_kas
+                            //                                         }{" "}
+                            //                                         - Pendapatan
+                            //                                         Lainnya
+                            //                                     </span>
+                            //                                     <br />
+                            //                                     {
+                            //                                         pendapatan.nama
+                            //                                     }
+                            //                                     <span>
+                            //                                         {" "}
+                            //                                         dengan
+                            //                                         jumlah{" "}
+                            //                                         {
+                            //                                             pendapatan.jumlah
+                            //                                         }
+                            //                                     </span>
+                            //                                 </td>
+                            //                                 <td className="px-3 py-2">
+                            //                                     {item.sewa
+                            //                                         .total +
+                            //                                         item.sewa.pendapatan_lainnya.reduce(
+                            //                                             (
+                            //                                                 acc,
+                            //                                                 item
+                            //                                             ) =>
+                            //                                                 acc +
+                            //                                                 item.total,
+                            //                                             0
+                            //                                         ) ===
+                            //                                     item.sewa
+                            //                                         .pembayaran ? (
+                            //                                         <>
+                            //                                             <RupiahFormat
+                            //                                                 value={
+                            //                                                     pendapatan.total
+                            //                                                 }
+                            //                                             />
+                            //                                         </>
+                            //                                     ) : item.sewa
+                            //                                           .total >
+                            //                                       item.sewa
+                            //                                           .pembayaran ? (
+                            //                                         <>-</>
+                            //                                     ) : (
+                            //                                         <>
+                            //                                             <RupiahFormat
+                            //                                                 value={
+                            //                                                     item
+                            //                                                         .sewa
+                            //                                                         .pembayaran -
+                            //                                                     item
+                            //                                                         .sewa
+                            //                                                         .total
+                            //                                                 }
+                            //                                             />
+                            //                                         </>
+                            //                                     )}
+                            //                                 </td>
+                            //                                 <td className="px-3 py-2">
+                            //                                     -
+                            //                                 </td>
+                            //                                 <td className="px-3 py-2">
+                            //                                     {item.sewa
+                            //                                         .total +
+                            //                                         item.sewa.pendapatan_lainnya.reduce(
+                            //                                             (
+                            //                                                 acc,
+                            //                                                 item
+                            //                                             ) =>
+                            //                                                 acc +
+                            //                                                 item.total,
+                            //                                             0
+                            //                                         ) ===
+                            //                                     item.sewa
+                            //                                         .pembayaran ? (
+                            //                                         <>
+                            //                                             <RupiahFormat
+                            //                                                 value={
+                            //                                                     (totalPendapatan +=
+                            //                                                         pendapatan.total)
+                            //                                                 }
+                            //                                             />
+                            //                                         </>
+                            //                                     ) : item.sewa
+                            //                                           .total >
+                            //                                       item.sewa
+                            //                                           .pembayaran ? (
+                            //                                         <>
+                            //                                             <RupiahFormat
+                            //                                                 value={
+                            //                                                     totalPendapatan
+                            //                                                 }
+                            //                                             />
+                            //                                         </>
+                            //                                     ) : (
+                            //                                         <>
+                            //                                             <RupiahFormat
+                            //                                                 value={
+                            //                                                     (totalPendapatan +=
+                            //                                                         item
+                            //                                                             .sewa
+                            //                                                             .pembayaran -
+                            //                                                         item
+                            //                                                             .sewa
+                            //                                                             .total)
+                            //                                                 }
+                            //                                             />
+                            //                                         </>
+                            //                                     )}
+                            //                                 </td>
+                            //                             </tr>
+                            //                         )
+                            //                     )
+                            //                 ) : (
+                            //                     <></>
+                            //                 )}
+                            //             </>
+                            //         ) : (
+                            //             <tr
+                            //                 className="bg-white border-b hover:bg-gray-50 align-top"
+                            //                 key={`row-p-${item.id}`}
+                            //             >
+                            //                 <td className="px-8 py-2">
+                            //                     {index + 1}
+                            //                 </td>
+                            //                 <td className="px-3 py-2">
+                            //                     <FormatDateRange
+                            //                         startDateString={
+                            //                             item.pengeluaran.tanggal
+                            //                         }
+                            //                         endDateString={
+                            //                             item.pengeluaran.tanggal
+                            //                         }
+                            //                     />
+                            //                 </td>
+                            //                 <td className="px-3 py-2">
+                            //                     <span className="font-semibold">
+                            //                         {item.pengeluaran.id_pengeluarans} -
+                            //                         Pengeluaran
+                            //                     </span>
+                            //                     <br />
+                            //                     {item.pengeluaran.nama}
+                            //                     <br />
+                            //                     <span className="">
+                            //                         Detail :{" "}
+                            //                         {
+                            //                             item.pengeluaran
+                            //                                 .keterangan
+                            //                         }
+                            //                     </span>
+                            //                 </td>
+                            //                 <td className="px-3 py-2"> - </td>
+                            //                 <td className="px-3 py-2">
+                            //                     <RupiahFormat
+                            //                         value={
+                            //                             item.pengeluaran.total
+                            //                         }
+                            //                     />
+                            //                 </td>
+                            //                 <td className="px-3 py-2">
+                            //                     <RupiahFormat
+                            //                         value={
+                            //                             (totalPendapatan -=
+                            //                                 item.pengeluaran
+                            //                                     .total)
+                            //                         }
+                            //                     />
+                            //                 </td>
+                            //             </tr>
+                            //         )}
+                            //     </React.Fragment>
+                            // ))
                             kasList.map((item, index) => (
-                                <React.Fragment key={item.id_kas}>
-                                    {item.id_kas.startsWith("PS") ? (
-                                        <>
-                                            <tr
-                                                className="bg-white border-b hover:bg-gray-50 align-top"
-                                                key={`row-ps-${item.id}`}
-                                            >
-                                                <td className="px-8 py-2 w-28">
-                                                    {index + 1}
+                                <React.Fragment
+                                    key={item.id_history_pembayaran}
+                                >
+                                    <tr
+                                        className="bg-white border-b hover:bg-gray-50 align-top"
+                                        key={`row-ps-${item.id_history_pembayaran}`}
+                                    >
+                                        <td className="px-8 py-2 w-28">
+                                            {index + 1}
+                                        </td>
+                                        <td className="px-3 py-2">
+                                            <FormatDateRange
+                                                startDateString={
+                                                    item.created_at
+                                                }
+                                                endDateString={item.created_at}
+                                            />
+                                        </td>
+                                        {item.sewa_id === null ? (
+                                            <>
+                                                <td className="px-3 py-2">
+                                                    <span className="font-medium">
+                                                        {item.pengeluaran_id} -
+                                                        Pengeluaran
+                                                    </span>
+                                                    <br />
+                                                    Detail :{" "}
+                                                    {item.pengeluaran.nama}
                                                 </td>
                                                 <td className="px-3 py-2">
-                                                    <FormatDateRange
-                                                        startDateString={
-                                                            item.sewa
-                                                                .created_at
-
-                                                        }
-                                                        endDateString={
-                                                            item.sewa
-                                                                .created_at
-
-                                                        }
+                                                    {" "}
+                                                    -
+                                                </td>
+                                                <td className="px-3 py-2">
+                                                    <RupiahFormat
+                                                        value={item.total}
                                                     />
                                                 </td>
                                                 <td className="px-3 py-2">
-                                                    {item.sewa.total +
-                                                        item.sewa.pendapatan_lainnya.reduce(
-                                                            (acc, item) =>
-                                                                acc +
-                                                                item.total,
-                                                            0
-                                                        ) ===
-                                                    item.sewa.pembayaran ? (
-                                                        <>
-                                                            <span className="bg-green-100 text-green-800 font-medium me-2 px-2.5 py-0.5 rounded">
-                                                                Lunas
-                                                            </span>
-                                                        </>
-                                                    ) : (
-                                                        <span className="bg-yellow-100 text-yellow-800 font-medium me-2 px-2.5 py-0.5 rounded">
-                                                            Termin
-                                                        </span>
-                                                    )}
+                                                    <RupiahFormat
+                                                        value={
+                                                            (laba -= item.total)
+                                                        }
+                                                    />
+                                                </td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td className="px-3 py-2">
                                                     <span className="font-medium">
-                                                        {item.id_kas} - Sewa
-                                                        Kendaraan
+                                                        {item.sewa_id} - Sewa
                                                     </span>
                                                     <br />
-                                                    {item.sewa.sewa_kendaraan
-                                                        .length > 0 && (
-                                                        <span>
-                                                            {item.sewa.sewa_kendaraan
-                                                                .map(
-                                                                    (
-                                                                        kendaraan
-                                                                    ) =>
-                                                                        `${kendaraan.kendaraan.nama} (${kendaraan.kendaraan.no_registrasi})`
-                                                                )
-                                                                .join(", ")}
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                <td className="px-3 py-2">
-                                                    {item.sewa.total +
-                                                        item.sewa.pendapatan_lainnya.reduce(
-                                                            (acc, item) =>
-                                                                acc +
-                                                                item.total,
-                                                            0
-                                                        ) ===
-                                                    item.sewa.pembayaran ? (
-                                                        <>
-                                                            <RupiahFormat
-                                                                value={
-                                                                    item.sewa
-                                                                        .total
-                                                                }
-                                                            />
-                                                        </>
-                                                    ) : item.sewa.total >
-                                                      item.sewa.pembayaran ? (
-                                                        <>
-                                                            <RupiahFormat
-                                                                value={
-                                                                    item.sewa
-                                                                        .pembayaran
-                                                                }
-                                                            />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <RupiahFormat
-                                                                value={
-                                                                    item.sewa
-                                                                        .total
-                                                                }
-                                                            />
-                                                        </>
-                                                    )}
-                                                </td>
-                                                <td className="px-3 py-2">-</td>
-                                                <td className="px-3 py-2">
-                                                    {item.sewa.total +
-                                                        item.sewa.pendapatan_lainnya.reduce(
-                                                            (acc, item) =>
-                                                                acc +
-                                                                item.total,
-                                                            0
-                                                        ) ===
-                                                    item.sewa.pembayaran ? (
-                                                        <>
-                                                            <RupiahFormat
-                                                                value={
-                                                                    (totalPendapatan +=
-                                                                        item
-                                                                            .sewa
-                                                                            .total)
-                                                                }
-                                                            />
-                                                        </>
-                                                    ) : item.sewa.total >
-                                                      item.sewa.pembayaran ? (
-                                                        <>
-                                                            <RupiahFormat
-                                                                value={
-                                                                    (totalPendapatan +=
-                                                                        item
-                                                                            .sewa
-                                                                            .pembayaran)
-                                                                }
-                                                            />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <RupiahFormat
-                                                                value={
-                                                                    (totalPendapatan +=
-                                                                        item
-                                                                            .sewa
-                                                                            .total)
-                                                                }
-                                                            />
-                                                        </>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                            {item.sewa.pendapatan_lainnya &&
-                                            item.sewa.pendapatan_lainnya
-                                                .length > 0 ? (
-                                                item.sewa.pendapatan_lainnya.map(
-                                                    (pendapatan, idx) => (
-                                                        <tr
-                                                            className="bg-white border-b hover:bg-gray-50 align-top"
-                                                            key={`row-ps-pendapatan-${item.id}-${idx}`}
-                                                        >
-                                                            <td className="px-3 py-2"></td>
-                                                            <td className="px-3 py-2"></td>
-                                                            <td className="px-3 py-2">
-                                                                {item.sewa
-                                                                    .total +
-                                                                    item.sewa.pendapatan_lainnya.reduce(
-                                                                        (
-                                                                            acc,
-                                                                            item
-                                                                        ) =>
-                                                                            acc +
-                                                                            item.total,
-                                                                        0
-                                                                    ) ===
-                                                                item.sewa
-                                                                    .pembayaran ? (
-                                                                    <>
-                                                                        <span className="bg-green-100 text-green-800 font-medium me-2 px-2.5 py-0.5 rounded">
-                                                                            Lunas
-                                                                        </span>
-                                                                    </>
-                                                                ) : (
-                                                                    <span className="bg-yellow-100 text-yellow-800 font-medium me-2 px-2.5 py-0.5 rounded">
-                                                                        Termin
-                                                                    </span>
-                                                                )}
-                                                                <span className="font-semibold">
-                                                                    {
-                                                                        item.id_kas
-                                                                    }{" "}
-                                                                    - Pendapatan
-                                                                    Lainnya
-                                                                </span>
-                                                                <br />
+                                                    {item.sewa.nama} {" - "}
+                                                    {item.sewa.sewa_kendaraan.map(
+                                                        (sk, idx) => (
+                                                            <span key={idx}>
                                                                 {
-                                                                    pendapatan.nama
+                                                                    sk.kendaraan
+                                                                        .nama
                                                                 }
-                                                                <span>
-                                                                    {" "}
-                                                                    dengan
-                                                                    jumlah{" "}
-                                                                    {
-                                                                        pendapatan.jumlah
-                                                                    }
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-3 py-2">
-                                                                {item.sewa
-                                                                    .total +
-                                                                    item.sewa.pendapatan_lainnya.reduce(
-                                                                        (
-                                                                            acc,
-                                                                            item
-                                                                        ) =>
-                                                                            acc +
-                                                                            item.total,
-                                                                        0
-                                                                    ) ===
+                                                                (
+                                                                {
+                                                                    sk.kendaraan
+                                                                        .no_registrasi
+                                                                }
+                                                                )
+                                                                {idx <
                                                                 item.sewa
-                                                                    .pembayaran ? (
-                                                                    <>
-                                                                        <RupiahFormat
-                                                                            value={
-                                                                                pendapatan.total
-                                                                            }
-                                                                        />
-                                                                    </>
-                                                                ) : item.sewa
-                                                                      .total >
-                                                                  item.sewa
-                                                                      .pembayaran ? (
-                                                                    <>-</>
-                                                                ) : (
-                                                                    <>
-                                                                        <RupiahFormat
-                                                                            value={
-                                                                                item
-                                                                                    .sewa
-                                                                                    .pembayaran -
-                                                                                item
-                                                                                    .sewa
-                                                                                    .total
-                                                                            }
-                                                                        />
-                                                                    </>
-                                                                )}
-                                                            </td>
-                                                            <td className="px-3 py-2">
-                                                                -
-                                                            </td>
-                                                            <td className="px-3 py-2">
-                                                                {item.sewa
-                                                                    .total +
-                                                                    item.sewa.pendapatan_lainnya.reduce(
-                                                                        (
-                                                                            acc,
-                                                                            item
-                                                                        ) =>
-                                                                            acc +
-                                                                            item.total,
-                                                                        0
-                                                                    ) ===
-                                                                item.sewa
-                                                                    .pembayaran ? (
-                                                                    <>
-                                                                        <RupiahFormat
-                                                                            value={
-                                                                                (totalPendapatan +=
-                                                                                    pendapatan.total)
-                                                                            }
-                                                                        />
-                                                                    </>
-                                                                ) : item.sewa
-                                                                      .total >
-                                                                  item.sewa
-                                                                      .pembayaran ? (
-                                                                    <>
-                                                                        <RupiahFormat
-                                                                            value={
-                                                                                totalPendapatan
-                                                                            }
-                                                                        />
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <RupiahFormat
-                                                                            value={
-                                                                                (totalPendapatan +=
-                                                                                    item
-                                                                                        .sewa
-                                                                                        .pembayaran -
-                                                                                    item
-                                                                                        .sewa
-                                                                                        .total)
-                                                                            }
-                                                                        />
-                                                                    </>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                )
-                                            ) : (
-                                                <></>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <tr
-                                            className="bg-white border-b hover:bg-gray-50 align-top"
-                                            key={`row-p-${item.id}`}
-                                        >
-                                            <td className="px-8 py-2">
-                                                {index + 1}
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <FormatDateRange
-                                                    startDateString={
-                                                        item.pengeluaran.tanggal
-                                                    }
-                                                    endDateString={
-                                                        item.pengeluaran.tanggal
-                                                    }
-                                                />
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <span className="font-semibold">
-                                                    {item.pengeluaran.id_pengeluarans} -
-                                                    Pengeluaran
-                                                </span>
-                                                <br />
-                                                {item.pengeluaran.nama}
-                                                <br />
-                                                <span className="">
-                                                    Detail :{" "}
-                                                    {
-                                                        item.pengeluaran
-                                                            .keterangan
-                                                    }
-                                                </span>
-                                            </td>
-                                            <td className="px-3 py-2"> - </td>
-                                            <td className="px-3 py-2">
-                                                <RupiahFormat
-                                                    value={
-                                                        item.pengeluaran.total
-                                                    }
-                                                />
-                                            </td>
-                                            <td className="px-3 py-2">
-                                                <RupiahFormat
-                                                    value={
-                                                        (totalPendapatan -=
-                                                            item.pengeluaran
-                                                                .total)
-                                                    }
-                                                />
-                                            </td>
-                                        </tr>
-                                    )}
+                                                                    .sewa_kendaraan
+                                                                    .length -
+                                                                    1
+                                                                    ? ", "
+                                                                    : ""}
+                                                            </span>
+                                                        )
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-2">
+                                                    <RupiahFormat
+                                                        value={item.total}
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-2">
+                                                    {" "}
+                                                    -
+                                                </td>
+                                                <td className="px-3 py-2">
+                                                    <RupiahFormat
+                                                        value={
+                                                            (laba += item.total)
+                                                        }
+                                                    />
+                                                </td>
+                                            </>
+                                        )}
+                                    </tr>
                                 </React.Fragment>
                             ))
                         ) : (

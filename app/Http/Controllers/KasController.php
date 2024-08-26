@@ -139,20 +139,12 @@ class KasController extends Controller
 
     public function indexBukuBesar(Request $request)
     {
-        $query = Kas::with('sewa', 'pengeluaran', 'sewa.sewaKendaraan', 'sewa.sewaKendaraan.kendaraan', 'sewa.pendapatanLainnya');
+        $query = HistoryPembayaran::with('pengeluaran', 'sewa.sewaKendaraan.kendaraan', 'sewa.pendapatanLainnya', 'sewa.historyPembayaran',);
 
         if ($request->filled('startDate') && $request->filled('endDate')) {
-            $startDate = $request->input('startDate');
-            $endDate = $request->input('endDate');
-            $query->whereHas('sewa', function ($q) use ($startDate, $endDate) {
-                $q->where(function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('mulai_tanggal', [$startDate, $endDate])
-                        ->orWhereBetween('akhir_tanggal', [$startDate, $endDate]);
-                });
-            });
-            $query->orWhereHas('pengeluaran', function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('tanggal', [$startDate, $endDate]);
-            });
+            $startDate = date('Y-m-d 00:00:00', strtotime($request->input('startDate')));
+            $endDate = date('Y-m-d 23:59:59', strtotime($request->input('endDate')));
+            $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
         $kasList = $query->get();

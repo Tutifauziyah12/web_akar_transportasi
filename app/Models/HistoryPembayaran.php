@@ -34,6 +34,6 @@ class HistoryPembayaran extends Model
 
     public function pengeluaran()
     {
-        return $this->belongsTo(Sewa::class, 'sewa_id');
+        return $this->belongsTo(Pengeluaran::class, 'pengeluaran_id');
     }
 }
